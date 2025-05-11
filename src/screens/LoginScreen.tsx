@@ -62,9 +62,13 @@ class LoginScreen extends Component<Props, State> {
     return (
       <View className="flex-1 justify-around">
         <View className="flex flex-row justify-center">
-          <Image className="w-35 h-40 mb-10" source={require('../assets/images/logo.png')} />
+          <Image
+            className="w-40 h-40 mb-1 mt-8 rounded-full"
+            source={require('../assets/images/logo.png')}
+            resizeMode="contain"
+          />
         </View>
-        <View className="px-8 pt-8">
+        <View className="px-8 pt-2">
           <View className="form space-y-2">
             <Text className="text-lg font-bold text-violet-700 leading-9">Email Address</Text>
             <TextInput
@@ -97,7 +101,7 @@ class LoginScreen extends Component<Props, State> {
               <Text className="text-violet-700 font-bold text-xl">Forgot Password?</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="border-2 bg-violet-700 text-gray-700 border-gray-300 rounded-md px-4 py-2"
+              className="border-2 bg-violet-700 text-gray-700 border-gray-300 rounded-lg px-4 py-2"
               onPress={this.handleLogin}>
               {loading ? (
                 <ActivityIndicator size="large" color="white" />
@@ -107,7 +111,7 @@ class LoginScreen extends Component<Props, State> {
             </TouchableOpacity>
           </View>
         </View>
-        <View className="flex-row justify-center mt-5">
+        <View className="flex-row justify-center mt-2">
           <Text className=" font-bold text-xl"> Don&apos;t have an account?</Text>
           <Link href="/signup" asChild className="pl-2">
             <Text className="text-center text-violet-700 font-bold  text-xl ">Signup</Text>

@@ -1,34 +1,24 @@
 import { Stack } from 'expo-router/stack';
 
-export default function StackLayout() {
+export default function StackMeLayout() {
   return (
     <Stack>
-      <Stack.Screen name="home" options={{ headerShown: false }} />
+      <Stack.Screen name="myProfile" options={{ headerShown: false }} />
       <Stack.Screen
-        name="scanQuestion"
+        name="settings"
         options={{
           headerShown: true,
-          title: 'Scan Question',
+          title: 'Settings',
           headerStyle: { backgroundColor: '#6844EE' },
           headerTintColor: 'white',
           headerTitleStyle: { color: 'white' },
         }}
       />
       <Stack.Screen
-        name="scanEquation"
+        name="account"
         options={{
           headerShown: true,
-          title: 'Scan Equation',
-          headerStyle: { backgroundColor: '#6844EE' },
-          headerTintColor: 'white',
-          headerTitleStyle: { color: 'white' },
-        }}
-      />
-      <Stack.Screen
-        name="typeEquation"
-        options={{
-          headerShown: true,
-          title: 'Type Equation',
+          title: 'Manage Profile',
           headerStyle: { backgroundColor: '#6844EE' },
           headerTintColor: 'white',
           headerTitleStyle: { color: 'white' },

@@ -1,7 +1,6 @@
 import { Component } from 'react';
-import { View, Text, Image, Animated, StyleSheet } from 'react-native';
+import { View, Text, Image, Animated, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
 
 import styles from '@/src/styles';
@@ -93,8 +92,8 @@ class HomeScreen extends Component<Props, State> {
           className="w-full h-64 bg-primary rounded-b-xl flex-row pt-4 border-2">
           <Image source={require('../assets/images/thinking.png')} className="w-5/12 h-80 mt-5" />
           <View className="bg-primary w-7/12 items-center rounded-b-xl pt-10">
-            <Text className="text-white font-bold text-2xl max-w-full">
-              What You want to Solve?
+            <Text className="text-white font-bold text-xl max-w-full">
+              Everything You want to Solve?
             </Text>
             <View className="bg-primary w-50 h-18 mt-2">
               <Animated.Text style={styles2.AnimatedTax}>
@@ -104,23 +103,23 @@ class HomeScreen extends Component<Props, State> {
           </View>
         </View>
         <View className="bg-sky-50 flex-1 items-center pt-5">
-          {/* <TouchableOpacity
+          <TouchableOpacity
             style={styles.shadow}
             className="w-11/12 h-18 bg-white rounded-lg flex-row mt-12 justify-center items-center"
             onPress={() => router.push('/scanQuestion')}>
             <MaterialCommunityIcons name="text-recognition" size={45} color="#6844EE" />
             <Text className="text-center text-2xl text-gray-900 font-bold ml-8">Scan Question</Text>
             <MaterialIcons name="navigate-next" size={50} color="#6844EE" />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
-          {/* <TouchableOpacity
+          <TouchableOpacity
             style={styles.shadow}
             className="w-11/12 h-18 bg-white rounded-lg flex-row mt-12 justify-center items-center"
             onPress={() => router.push('/scanEquation')}>
             <MaterialCommunityIcons name="math-integral" size={45} color="#6844EE" />
             <Text className="text-center text-2xl text-gray-900 font-bold ml-8">Scan Equation</Text>
             <MaterialIcons name="navigate-next" size={50} color="#6844EE" />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.shadow}
             className="w-11/12 h-18 bg-white rounded-lg flex-row mt-12 justify-center items-center"

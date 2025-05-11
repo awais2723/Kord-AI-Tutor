@@ -3,6 +3,7 @@
     "name": "Kord Snap & Solve",
     "slug": "kord-snap-and-solve",
     "version": "1.0.1",
+    "owner": "kord_snap_and_solve",
     "orientation": "portrait",
     "icon": "./src/assets/images/logo.png",
     "scheme": "kord-snap-and-solve",
@@ -22,7 +23,8 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.kordsnapandsolve.app",
-      "versionCode": 1
+      "versionCode": 1,
+      "permissions": ["CAMERA"]
     },
     "web": {
       "bundler": "metro",

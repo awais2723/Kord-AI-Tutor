@@ -1,10 +1,10 @@
 import { HeaderContent } from '@/src/components';
-import { HistoryScreen } from '@/src/screens';
+import { TakeQuizScreen } from '@/src/screens';
 
 const HistoryPage = () => (
   <>
     <HeaderContent />
-    <HistoryScreen />
+    <TakeQuizScreen />
   </>
 );
 

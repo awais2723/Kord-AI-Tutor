@@ -12,8 +12,10 @@ const HomeIcon = ({ focused, color, size }: TabBarIcon) => (
   <FontAwesome size={focused ? size + 8 : size + 4} name="home" color={color} />
 );
 
-const historyIcon = ({ focused, color, size }: TabBarIcon) => (
-  <MaterialIcons size={focused ? size + 8 : size + 4} name="history" color={color} />
+
+
+const QuizIcon = ({ focused, color, size }: TabBarIcon) => (
+  <MaterialIcons size={focused ? size + 8 : size + 4} name="assignment" color={color} />
 );
 
 const MeIcon = ({ focused, color, size }: TabBarIcon) => (
@@ -32,7 +34,7 @@ const TabLayout = () => (
       },
     }}>
     <Tabs.Screen
-      name="(stack)"
+      name="(stack-home)"
       options={{
         tabBarLabel: 'Home',
         tabBarIcon: HomeIcon,
@@ -50,10 +52,10 @@ const TabLayout = () => (
       }}
     />
     <Tabs.Screen
-      name="history"
+      name="quiz"
       options={{
-        tabBarLabel: 'History',
-        tabBarIcon: historyIcon,
+        tabBarLabel: 'Take Quiz',
+        tabBarIcon: QuizIcon,
         tabBarStyle: {
           position: 'absolute',
           bottom: 5,
@@ -68,7 +70,7 @@ const TabLayout = () => (
       }}
     />
     <Tabs.Screen
-      name="myProfile"
+      name="(stack-me)"
       options={{
         tabBarLabel: 'Me',
         tabBarIcon: MeIcon,

@@ -8,7 +8,7 @@ export { default as HomeScreen } from '@/src/screens/HomeScreen';
 export { default as AccountScreen } from '@/src/screens/AccountScreen';
 export { default as SettingsScreen } from '@/src/screens/SettingsScreen';
 export { default as NotFoundScreen } from '@/src/screens/NotFoundScreen';
-export { default as HistoryScreen } from '@/src/screens/HistoryScreen';
+export { default as TakeQuizScreen } from '@/src/screens/TakeQuizScreen';
 export { default as MyProfileScreen } from '@/src/screens/MyProfileScreen';
 export { default as ScanQuestionScreen } from '@/src/screens/ScanQuestionScreen';
 export { default as ScanEquationScreen } from '@/src/screens/ScanEquationScreen';
