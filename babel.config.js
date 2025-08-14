@@ -3,20 +3,9 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
+      'react-native-reanimated/plugin',
       'nativewind/babel',
       ['@babel/plugin-transform-flow-strip-types', { allowDeclareFields: true }],
-      [
-        'module:react-native-dotenv',
-        {
-          moduleName: '@env',
-          path: '.env',
-          blacklist: null,
-          whitelist: null,
-          safe: true,
-          allowUndefined: true,
-        },
-      ],
-      'react-native-reanimated/plugin',
     ],
   };
 };

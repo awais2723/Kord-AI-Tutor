@@ -12,8 +12,6 @@ const HomeIcon = ({ focused, color, size }: TabBarIcon) => (
   <FontAwesome size={focused ? size + 8 : size + 4} name="home" color={color} />
 );
 
-
-
 const QuizIcon = ({ focused, color, size }: TabBarIcon) => (
   <MaterialIcons size={focused ? size + 8 : size + 4} name="assignment" color={color} />
 );
@@ -27,6 +25,7 @@ const TabLayout = () => (
     screenOptions={{
       headerShown: false,
       tabBarActiveTintColor: '#6844EE',
+
       tabBarLabelStyle: {
         fontSize: 12,
         fontWeight: 'bold',

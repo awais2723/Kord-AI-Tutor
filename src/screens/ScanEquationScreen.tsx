@@ -54,7 +54,7 @@ class ScanEquationScreen extends Component<Props, State> {
             headers: {
               'Content-Type': 'application/json',
             },
-            timeout: 300000, // Set timeout to 5 minutes
+            timeout: 500000, // Set timeout to 5 minutes
           });
           // eslint-disable-next-line no-console
           console.log('Response:', response.data);

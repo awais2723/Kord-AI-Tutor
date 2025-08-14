@@ -2,3 +2,4 @@
 exporting a default provider from a specific file using the `export { default as ProviderName }
 from 'filePath';` syntax. */
 export { default as AuthRouteProvider } from '@/providers/AuthRouteProvider';
+export { default as TextProvider } from '@/providers/TextProvider';

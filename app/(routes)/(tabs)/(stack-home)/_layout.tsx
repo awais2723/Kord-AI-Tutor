@@ -14,7 +14,29 @@ export default function StackLayout() {
           headerTitleStyle: { color: 'white' },
         }}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
+        name="editScannedText"
+        options={{
+          headerShown: true,
+          title: 'Edit Text',
+          headerStyle: { backgroundColor: '#6844EE' },
+          headerTintColor: 'white',
+          headerTitleStyle: { color: 'white' },
+        }}
+      />
+
+      <Stack.Screen
+        name="showResult"
+        options={{
+          headerShown: true,
+          title: 'Result',
+          headerStyle: { backgroundColor: '#6844EE' },
+          headerTintColor: 'white',
+          headerTitleStyle: { color: 'white' },
+        }}
+      />
+
+      <Stack.Screen
         name="scanEquation"
         options={{
           headerShown: true,
@@ -23,7 +45,7 @@ export default function StackLayout() {
           headerTintColor: 'white',
           headerTitleStyle: { color: 'white' },
         }}
-      /> */}
+      />
       <Stack.Screen
         name="typeEquation"
         options={{

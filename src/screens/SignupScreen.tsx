@@ -4,7 +4,11 @@ import { Feather } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { doCreateUserWithEmailAndPassword, getErrorMessage } from '@/firebase/auth';
+import {
+  doCreateUserWithEmailAndPassword,
+  getErrorMessage,
+  doSendEmailVerification,
+} from '@/firebase/auth';
 
 type Props = object;
 
@@ -32,30 +36,47 @@ class SignupScreen extends Component<Props, State> {
 
   handleSignup = async () => {
     const { username, email, password, loading } = this.state;
-    if (loading) {
-      return;
-    }
-    if (username === '' || email === '' || password === '') {
+    if (loading) return;
+
+    if (!username || !email || !password) {
       this.setState({ message: { success: '', error: 'All fields are required' } });
       setTimeout(() => this.setState({ message: { success: '', error: '' } }), 3000);
       return;
     }
+
     this.setState({ loading: true, showPassword: false });
+
     try {
-      await doCreateUserWithEmailAndPassword(username, email, password);
+      console.log('creating user');
+      const userCredential = await doCreateUserWithEmailAndPassword(username, email, password);
+      const user = userCredential.user;
+
+      // Send email verification
+      console.log('sending email verification');
+
+      if (user) {
+        await doSendEmailVerification();
+        setTimeout(() => router.push('/home'), 3000);
+      }
+
       this.setState({
         username: '',
         email: '',
         password: '',
-        message: { success: 'Registered Successfully', error: '' },
+        message: {
+          success: 'Registered successfully. Please check your email for verification.',
+          error: '',
+        },
       });
-      setTimeout(() => router.push('/home'), 2000);
     } catch (error: any) {
+      console.error('CAUGHT FIREBASE ERROR:', error);
+
       this.setState({
         message: { success: '', error: getErrorMessage(error.code) },
         showPassword: true,
       });
     }
+
     this.setState({ loading: false });
     setTimeout(() => this.setState({ message: { success: '', error: '' } }), 3000);
   };

@@ -13,3 +13,5 @@ export { default as MyProfileScreen } from '@/src/screens/MyProfileScreen';
 export { default as ScanQuestionScreen } from '@/src/screens/ScanQuestionScreen';
 export { default as ScanEquationScreen } from '@/src/screens/ScanEquationScreen';
 export { default as TypeEquationScreen } from '@/src/screens/TypeEquationScreen';
+export { default as EditScannedTextScreen } from './EditScannedTextScreen';
+export { default as ShowResultScreen } from './ShowResultScreen';

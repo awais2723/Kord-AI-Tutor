@@ -9,6 +9,7 @@ import {
   UserCredential,
   updateProfile,
 } from 'node_modules/firebase/auth';
+// import * as Linking from 'expo-linking';
 
 import { auth } from '@/firebase/config';
 
@@ -16,15 +17,20 @@ export const doCreateUserWithEmailAndPassword = async (
   username: string,
   email: string,
   password: string
-) => {
-  const { user }: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
-  await updateProfile(user, {
+): Promise<UserCredential> => {
+  const userCredential: UserCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+  await updateProfile(userCredential.user, {
     displayName: username,
   });
+  return userCredential; // <-- Return this!
 };
 
 export const doSignInWithEmailAndPassword = async (email: string, password: string) => {
-  await signInWithEmailAndPassword(auth, email, password);
+  return await signInWithEmailAndPassword(auth, email, password);
 };
 
 export const doSignOut = async () => {
@@ -32,7 +38,18 @@ export const doSignOut = async () => {
 };
 
 export const doPasswordReset = async (email: string) => {
-  sendPasswordResetEmail(auth, email, { url: `${window.location.origin}/login` });
+  try {
+    // Remove window.location.origin — not valid in React Native
+    await sendPasswordResetEmail(auth, email, {
+      url: 'https://kord-ai-tutor.firebaseapp.com/login', // This must be whitelisted in Firebase Console
+      handleCodeInApp: true,
+    });
+    console.log('Password reset email sent!');
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error sending password reset email:', error);
+    throw error; // Let UI handle message display
+  }
 };
 
 export const doPasswordChange = async (password: string) => {
@@ -42,10 +59,15 @@ export const doPasswordChange = async (password: string) => {
 };
 
 export const doSendEmailVerification = async () => {
-  if (auth.currentUser) {
-    await sendEmailVerification(auth.currentUser, {
-      url: `${window.location.origin}/home`,
-    });
+  try {
+    if (auth.currentUser) {
+      await sendEmailVerification(auth.currentUser, {
+        url: 'https://kord-ai-tutor.firebaseapp.com',
+      });
+    }
+    console.log(' Email verification sent!');
+  } catch (error) {
+    console.error(' Error sending email verification:', error);
   }
 };
 

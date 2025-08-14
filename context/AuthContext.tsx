@@ -39,8 +39,11 @@ const AuthProvider: React.FC<Props> = ({ children }: Props) => {
     const initializeUser = (user: User | null) => {
       setLoading(true);
       if (user) {
-        setCurrentUser(user);
-        setUserLoggedIn(true);
+        // console.log(user.emailVerified);
+        if (user.emailVerified) {
+          setCurrentUser(user);
+          setUserLoggedIn(true);
+        }
       } else {
         setCurrentUser(null);
         setUserLoggedIn(false);

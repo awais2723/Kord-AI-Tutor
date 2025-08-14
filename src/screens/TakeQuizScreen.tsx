@@ -8,6 +8,8 @@ import {
   ScrollView,
   StyleSheet,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 const quizTypes = ['Short Questions', 'MCQs'];
@@ -39,26 +41,13 @@ class TakeQuizScreen extends Component<Props, State> {
     this.setState({ selectedDifficulty: level });
   };
 
-  renderOption = (
-    options: string[],
-    selectedValue: string,
-    onSelect: (val: string) => void
-  ) =>
-    options.map((item) => (
+  renderOption = (options: string[], selectedValue: string, onSelect: (val: string) => void) =>
+    options.map(item => (
       <TouchableOpacity
         key={item}
-        style={[
-          styles.optionButton,
-          selectedValue === item && styles.optionSelected,
-        ]}
-        onPress={() => onSelect(item)}
-      >
-        <Text
-          style={[
-            styles.optionText,
-            selectedValue === item && styles.optionTextSelected,
-          ]}
-        >
+        style={[styles.optionButton, selectedValue === item && styles.optionSelected]}
+        onPress={() => onSelect(item)}>
+        <Text style={[styles.optionText, selectedValue === item && styles.optionTextSelected]}>
           {item}
         </Text>
       </TouchableOpacity>
@@ -69,7 +58,9 @@ class TakeQuizScreen extends Component<Props, State> {
 
     return (
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Take a Quiz</Text>
 
           <Text style={styles.label}>Topic</Text>
@@ -78,30 +69,28 @@ class TakeQuizScreen extends Component<Props, State> {
             placeholder="Type your topic or explanation..."
             multiline
             value={explanation}
-            onChangeText={(text) => this.setState({ explanation: text })}
+            onChangeText={text => this.setState({ explanation: text })}
           />
 
-          <Text style={styles.label}>Quiz Type</Text>
-          <View style={styles.optionRow}>
-            {this.renderOption(
-              quizTypes,
-              selectedQuizType,
-              this.handleQuizTypeSelect
-            )}
-          </View>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0} // Adjust this as needed
+          >
+            <Text style={styles.label}>Quiz Type</Text>
+            <View style={styles.optionRow}>
+              {this.renderOption(quizTypes, selectedQuizType, this.handleQuizTypeSelect)}
+            </View>
 
-          <Text style={styles.label}>Difficulty</Text>
-          <View style={styles.optionRow}>
-            {this.renderOption(
-              difficulties,
-              selectedDifficulty,
-              this.handleDifficultySelect
-            )}
-          </View>
+            <Text style={styles.label}>Difficulty</Text>
+            <View style={styles.optionRow}>
+              {this.renderOption(difficulties, selectedDifficulty, this.handleDifficultySelect)}
+            </View>
 
-          <TouchableOpacity style={styles.startButton}>
-            <Text style={styles.startButtonText}>Start Quiz</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.startButton}>
+              <Text style={styles.startButtonText}>Start Quiz</Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
         </ScrollView>
       </SafeAreaView>
     );

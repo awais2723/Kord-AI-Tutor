@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 from PIL import Image
 import base64
+import traceback
 from pix2tex.cli import LatexOCR
 from pylatexenc.latex2text import LatexNodes2Text
 import pytesseract 
@@ -107,6 +108,7 @@ def image_to_latex():
 @app.route('/text', methods=['POST'])
 @cross_origin()
 def image_to_text():
+    print("Post Request Received")
     """
     Endpoint to convert an uploaded image to text.
 
@@ -127,16 +129,23 @@ def image_to_text():
         # Decode the image data from the URI
         image_data = base64.b64decode(data['uri'].split(',')[1])
         image_file = Image.open(io.BytesIO(image_data))
-
+        print('processing image')
         # Process the image
         img = image_processing(image_file)
         
         # Convert the processed image to text format using Tesseract OCR
+        
         text_response = pytesseract.image_to_string(img)
+        print(text_response)
     except Exception as e:
+    
+        print("Error:", e)
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 400
+
     
     return jsonify({'text': text_response}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.18.3', port=5000)
+    app.run(debug=True, host='192.168.43.222', port=5000)
+# 192.168.0.106

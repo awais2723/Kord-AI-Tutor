@@ -3,5 +3,6 @@ exporting a default provider from a specific file using the `export { default as
 from 'filePath';` syntax. */
 export { default as AuthProvider } from '@/context/AuthContext';
 export { default as FirebaseProvider } from '@/context/FirebaseContext';
+export { default as TextProvider } from '@/context/TextContext';
 export * from '@/context/AuthContext';
 export * from '@/context/FirebaseContext';

@@ -1,53 +1,44 @@
-/* This code snippet is a React component called `ScanQuestionScreen` that utilizes the `useState` and
-`useEffect` hooks from React. It also imports necessary components and modules such as `Platform`,
-`PermissionsAndroid`, `Image`, `Alert`, `View`, and `DocumentScanner` for handling document scanning
-functionality. */
 import { Component } from 'react';
-import {
-  Platform,
-  PermissionsAndroid,
-  Image,
-  Alert,
-  View,
-  ActivityIndicator,
-  TouchableOpacity,
-  TextInput,
-  Text,
-} from 'react-native';
+import { Platform, PermissionsAndroid, Image, Alert, View, ActivityIndicator } from 'react-native';
 import DocumentScanner from 'react-native-document-scanner-plugin';
 import axios from 'axios';
 import mime from 'mime';
+import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import TextContext from '@/context/TextContext';
 
 import { SERVER_END_POINT } from '@/constants';
-import styles from '@/src/styles';
 
-type Props = object;
-
+type Props = {};
 type State = {
   scannedImage: string;
   loading: boolean;
-  text: string;
 };
 
 class ScanQuestionScreen extends Component<Props, State> {
+  static contextType = TextContext;
+  declare context: React.ContextType<typeof TextContext>;
+
   constructor(props: Props) {
     super(props);
     this.state = {
       scannedImage: '',
       loading: true,
-      text: '',
     };
   }
 
   componentDidMount() {
+    console.log('ScanQuestionScreen mounted ' + SERVER_END_POINT);
+    axios
+      .get(`${SERVER_END_POINT}/`)
+      .then(res => console.log('Server test success:', res.data))
+      .catch(err => console.log('Server test failed:', err.message));
     this.scanDocument();
   }
 
-  removeExtraSpaces(str: string) {
-    str = str.trim();
-    str = str.replace(/\s+/g, ' ');
-    return str;
-  }
+  removeExtraSpaces = (str: string) => {
+    return str.trim().replace(/\s+/g, ' ');
+  };
 
   sendImage = async (uri: string) => {
     this.setState({ loading: true });
@@ -58,7 +49,6 @@ class ScanQuestionScreen extends Component<Props, State> {
     reader.onloadend = async () => {
       if (reader.result && typeof reader.result === 'string') {
         const base64data = reader.result.split(',')[1];
-
         const payload = {
           uri: `data:${mime.getType(uri)};base64,${base64data}`,
           type: mime.getType(uri) || 'image/png',
@@ -67,21 +57,18 @@ class ScanQuestionScreen extends Component<Props, State> {
 
         try {
           const response = await axios.post(`${SERVER_END_POINT}/text`, payload, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            timeout: 300000, // Set timeout to 5 minutes
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 600000,
           });
-          // eslint-disable-next-line no-console
-          console.log('Response:', response.data);
-          this.setState({ text: this.removeExtraSpaces(response.data.text) });
-          this.setState({ loading: false });
-          this.setState({ scannedImage: '' });
+
+          const cleanedText = this.removeExtraSpaces(response.data.text);
+          this.setState({ loading: false, scannedImage: '' });
+          this.context.setText(cleanedText);
+
+          router.push('/editScannedText');
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error('Error sending POST request:', error);
-          this.setState({ loading: false });
-          this.setState({ scannedImage: '' });
+          this.setState({ loading: false, scannedImage: '' });
         }
       }
     };
@@ -98,10 +85,7 @@ class ScanQuestionScreen extends Component<Props, State> {
       return;
     }
 
-    const { scannedImages } = await DocumentScanner.scanDocument({
-      maxNumDocuments: 1,
-    });
-
+    const { scannedImages } = await DocumentScanner.scanDocument({ maxNumDocuments: 1 });
     if (scannedImages && scannedImages.length > 0) {
       this.setState({ scannedImage: scannedImages[0], loading: true });
       await this.sendImage(scannedImages[0]);
@@ -109,40 +93,18 @@ class ScanQuestionScreen extends Component<Props, State> {
   };
 
   render() {
-    const { scannedImage, loading, text } = this.state;
+    const { scannedImage, loading } = this.state;
 
-    if (scannedImage || loading) {
-      return (
-        <View className="bg-gray-100 flex flex-col flex-1 justify-center items-center">
-          {scannedImage && (
-            <Image resizeMode="contain" source={{ uri: scannedImage }} className="w-1/2 -mt-12" />
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-100">
+        <SafeAreaView className="flex flex-1 justify-center items-center">
+          {scannedImage !== '' && (
+            <Image source={{ uri: scannedImage }} resizeMode="contain" className="w-1/2 -mt-12" />
           )}
           {loading && <ActivityIndicator color="#6844EE" size="large" />}
-        </View>
-      );
-    }
-
-    if (text) {
-      return (
-        <View className="bg-gray-100 flex flex-col flex-1 justify-start items-center">
-          <TextInput
-            className="h-[600px] w-full text-black bg-white p-3"
-            style={{ textAlignVertical: 'top' }}
-            value={text}
-            onChangeText={e => this.setState({ text: e })}
-            multiline
-          />
-          <TouchableOpacity
-            style={styles.shadow}
-            className="border-2 w-4/5 mt-8 bg-primary border-gray-300 rounded-md py-2 flex flex-row justify-center items-center"
-            onPress={() => {}}>
-            <Text className="text-center text-white font-bold text-xl ml-2">Next</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-
-    return <View className="bg-gray-100 flex flex-col flex-1 justify-start items-center" />;
+        </SafeAreaView>
+      </View>
+    );
   }
 }
 

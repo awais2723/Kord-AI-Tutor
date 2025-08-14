@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { FirebaseProvider, AuthProvider } from '@/context';
+import TextProvider from '../providers/TextProvider';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -47,7 +48,9 @@ const RootLayout = () => {
       <StatusBar style="dark" animated={true} hideTransitionAnimation="fade" />
       <FirebaseProvider>
         <AuthProvider>
-          <Slot />
+          <TextProvider>
+            <Slot />
+          </TextProvider>
         </AuthProvider>
       </FirebaseProvider>
     </SafeAreaProvider>

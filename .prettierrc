@@ -7,6 +7,8 @@
   "arrowParens": "avoid",
   "endOfLine": "auto",
   "semi": true,
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "ignore",
   "overrides": [
     {
       "files": "*.json",
