@@ -5,11 +5,11 @@ import axios from 'axios';
 import mime from 'mime';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TextContext from '@/context/TextContext';
 
+import TextContext from '@/context/TextContext';
 import { SERVER_END_POINT } from '@/constants';
 
-type Props = {};
+type Props = object;
 type State = {
   scannedImage: string;
   loading: boolean;
@@ -36,9 +36,7 @@ class ScanQuestionScreen extends Component<Props, State> {
     this.scanDocument();
   }
 
-  removeExtraSpaces = (str: string) => {
-    return str.trim().replace(/\s+/g, ' ');
-  };
+  removeExtraSpaces = (str: string) => str.trim().replace(/\s+/g, ' ');
 
   sendImage = async (uri: string) => {
     this.setState({ loading: true });

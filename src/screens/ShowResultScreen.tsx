@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TextContext from '@/context/TextContext';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from 'expo-router';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+
+import TextContext from '@/context/TextContext';
 
 // Hook wrapper to hide tab bar when this screen is focused
 function HideTabBarWrapper({ children }: { children: React.ReactNode }) {

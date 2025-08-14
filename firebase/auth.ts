@@ -29,9 +29,8 @@ export const doCreateUserWithEmailAndPassword = async (
   return userCredential; // <-- Return this!
 };
 
-export const doSignInWithEmailAndPassword = async (email: string, password: string) => {
-  return await signInWithEmailAndPassword(auth, email, password);
-};
+export const doSignInWithEmailAndPassword = async (email: string, password: string) =>
+  await signInWithEmailAndPassword(auth, email, password);
 
 export const doSignOut = async () => {
   auth.signOut();
@@ -44,7 +43,7 @@ export const doPasswordReset = async (email: string) => {
       url: 'https://kord-ai-tutor.firebaseapp.com/login', // This must be whitelisted in Firebase Console
       handleCodeInApp: true,
     });
-    console.log('Password reset email sent!');
+    // console.log('Password reset email sent!');
     return { success: true };
   } catch (error: any) {
     console.error('Error sending password reset email:', error);

@@ -1,11 +1,11 @@
 import { Component } from 'react';
 import { View, TouchableOpacity, Image, Text } from 'react-native';
 import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons'; // or 'react-native-vector-icons'
+import { router } from 'expo-router';
 
 import { AuthContext, AuthContextType } from '@/context';
 import styles from '@/src/styles';
 import { doSignOut } from '@/firebase/auth';
-import { router } from 'expo-router';
 
 type Props = object;
 

@@ -10,10 +10,11 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TextContext from '@/context/TextContext';
-import { solveProblem } from '../../utils/openAiClient';
 import { router, useNavigation } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
+
+import TextContext from '@/context/TextContext';
+import { solveProblem } from '../../utils/openAiClient';
 
 // Wrapper to hide bottom tab bar
 function HideTabBarWrapper({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,7 @@ function HideTabBarWrapper({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-type Props = {};
+type Props = object;
 
 type State = {
   loading: boolean;
