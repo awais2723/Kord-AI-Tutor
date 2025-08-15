@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { AuthContext, AuthContextType } from '@/context';
 import styles from '@/src/styles';
 import { doSignOut } from '@/firebase/auth';
+import { solveProblem } from '../../utils/openAiClient';
 
 type Props = object;
 
@@ -13,8 +14,8 @@ class MyProfileScreen extends Component<Props> {
   static contextType = AuthContext;
   declare context: AuthContextType;
 
-  handleSettings = () => {
-    console.log('Navigate to Settings');
+  handleSettings = async () => {
+    console.log('settings clicked');
   };
 
   handleHelpCenter = () => {

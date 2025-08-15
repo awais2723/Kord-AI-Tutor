@@ -9,6 +9,8 @@ import pytesseract
 import cv2
 import numpy as np
 import io
+from openai import OpenAI
+
 
 # If you're on Windows, you will need to point pytesseract to the path where you installed Tesseract
 pytesseract.pytesseract.tesseract_cmd = r'tesseract'
@@ -145,7 +147,39 @@ def image_to_text():
 
     
     return jsonify({'text': text_response}), 200
+#OpenAI integeration routes
+
+OPENAI_API_KEY = "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"
+OPENAI_ORG_ID = "org-urd4KrI8gjWN4Km3oZfK22Rg"
+
+client = OpenAI(api_key=OPENAI_API_KEY, organization=OPENAI_ORG_ID)
+
+@app.route("/solve-problem", methods=["POST"])
+@cross_origin()
+def solve_problem():
+    try:
+        data = request.get_json()
+        input_text = data.get("inputText")
+
+        if not input_text:
+            return jsonify({"error": "Missing inputText"}), 400
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Solve this problem step-by-step: {input_text}",
+                }
+            ],
+            temperature=0.3,
+        )
+
+        answer = response.choices[0].message.content or "No answer provided."
+        return jsonify({"answer": answer})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.43.222', port=5000)
-# 192.168.0.106
+    app.run(debug=True, host='192.168.0.105', port=5000)

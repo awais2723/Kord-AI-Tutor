@@ -3,7 +3,7 @@ import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from 'expo-router';
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+
 
 import TextContext from '@/context/TextContext';
 
