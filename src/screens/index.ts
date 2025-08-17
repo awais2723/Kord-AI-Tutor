@@ -15,3 +15,7 @@ export { default as ScanEquationScreen } from '@/src/screens/ScanEquationScreen'
 export { default as TypeEquationScreen } from '@/src/screens/TypeEquationScreen';
 export { default as EditScannedTextScreen } from './EditScannedTextScreen';
 export { default as ShowResultScreen } from './ShowResultScreen';
+export {default as McqsQuizScreen }  from './mcqsQuizScreen';
+export {default as QuestionQuizScreen }  from './questionQuizScreen';
+export {default as McqsResultScreen }  from './McqsResultScreen';
+

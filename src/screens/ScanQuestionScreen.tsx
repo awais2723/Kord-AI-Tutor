@@ -63,7 +63,7 @@ class ScanQuestionScreen extends Component<Props, State> {
           this.setState({ loading: false, scannedImage: '' });
           this.context.setText(cleanedText);
 
-          router.push('/editScannedText');
+          router.replace('/editScannedText');
         } catch (error) {
           console.error('Error sending POST request:', error);
           this.setState({ loading: false, scannedImage: '' });
@@ -87,6 +87,11 @@ class ScanQuestionScreen extends Component<Props, State> {
     if (scannedImages && scannedImages.length > 0) {
       this.setState({ scannedImage: scannedImages[0], loading: true });
       await this.sendImage(scannedImages[0]);
+    } else if (!scannedImages || scannedImages.length === 0) {
+      // User closed the camera without capturing
+      this.setState({ loading: false });
+      router.back(); // or router.back();
+      return;
     }
   };
 

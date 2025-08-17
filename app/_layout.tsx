@@ -11,6 +11,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { FirebaseProvider, AuthProvider } from '@/context';
 import TextProvider from '../providers/TextProvider';
@@ -49,7 +50,9 @@ const RootLayout = () => {
       <FirebaseProvider>
         <AuthProvider>
           <TextProvider>
-            <Slot />
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <Slot />
+            </GestureHandlerRootView>
           </TextProvider>
         </AuthProvider>
       </FirebaseProvider>

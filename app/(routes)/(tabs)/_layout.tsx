@@ -51,7 +51,7 @@ const TabLayout = () => (
       }}
     />
     <Tabs.Screen
-      name="quiz"
+      name="(quiz-stack)"
       options={{
         tabBarLabel: 'Take Quiz',
         tabBarIcon: QuizIcon,

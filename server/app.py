@@ -10,6 +10,7 @@ import cv2
 import numpy as np
 import io
 from openai import OpenAI
+import json
 
 
 # If you're on Windows, you will need to point pytesseract to the path where you installed Tesseract
@@ -180,6 +181,144 @@ def solve_problem():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+# ======================================================================
+# START: NEW QUIZ GENERATION CODE
+# ======================================================================
+@app.route("/generate-quiz", methods=["POST"])
+@cross_origin()
+def generate_quiz():
+    try:
+        data = request.get_json()
+        topic = data.get("topic")
+        quiz_type = data.get("quizType")
+        difficulty = data.get("difficulty")
+
+        if not all([topic, quiz_type, difficulty]):
+            return jsonify({"error": "Missing required fields: topic, quizType, difficulty"}), 400
+
+        # Define the expected JSON structure based on the quiz type
+        if quiz_type == 'MCQs':
+            json_format_instructions = """
+            [
+              {
+                "question": "The question text...",
+                "options": ["Option A", "Option B", "Option C", "Option D"],
+                "correctAnswer": "The text of the correct option"
+              }
+            ]
+            """
+        else:  # Short Questions
+            json_format_instructions = """
+            [
+              {
+                "question": "The question text...",
+                
+              }
+            ]
+            """
+
+        # Construct a detailed prompt for the AI model
+        # prompt = f"""
+        # Generate a {difficulty} level quiz with 5 questions on the topic of "{topic}".
+        # The quiz type must be "{quiz_type}".
+        # Your entire response must be a single, valid JSON array, with no other text or explanations.
+        # Follow this exact JSON structure:
+        # {json_format_instructions}
+        # """
+
+        # response = client.chat.completions.create(
+        #     model="gpt-3.5-turbo",  # Using a model that supports JSON mode
+        #     response_format={"type": "json_object"},
+        #     messages=[
+        #         {"role": "system", "content": "You are an API that generates quizzes in a specified JSON format."},
+        #         {"role": "user", "content": prompt}
+        #     ],
+        #     temperature=0.6,
+        # )
+
+        # quiz_content = response.choices[0].message.content
+   
+        # The AI should return a JSON string. Parse it into a Python object.
+        # try:
+        #     quiz_data = json.loads(quiz_content)
+        #     # Sometimes the model wraps the list in a key, like {"questions": [...]}. Let's find the list.
+        #     if isinstance(quiz_data, dict):
+        #         list_values = [v for v in quiz_data.values() if isinstance(v, list)]
+        #         if list_values:
+        #             quiz_data = list_values[0] # Take the first list found
+        #         else:
+        #             raise ValueError("JSON from AI is a dictionary but contains no list of questions.")
+        # except (json.JSONDecodeError, ValueError) as e:
+        #     print("Error parsing AI response:", e)
+        #     print("Raw AI response received:", quiz_content)
+        #     return jsonify({"error": "Failed to parse the generated quiz from AI."}), 500
+
+        quiz_data = []
+        
+        # --- DUMMY DATA FOR TESTING ---
+        if quiz_type == 'MCQs':
+            quiz_data = [
+                {
+                    "question": "What is the capital of France?",
+                    "options": ["Berlin", "Madrid", "Paris", "Rome"],
+                    "correctAnswer": "Paris"
+                },
+                {
+                    "question": "Which planet is known as the Red Planet?",
+                    "options": ["Earth", "Mars", "Jupiter", "Venus"],
+                    "correctAnswer": "Mars"
+                },
+                {
+                    "question": "What is the largest ocean on Earth?",
+                    "options": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+                    "correctAnswer": "Pacific Ocean"
+                },
+                {
+                    "question": "Who wrote 'Hamlet'?",
+                    "options": ["Charles Dickens", "William Shakespeare", "Leo Tolstoy", "Mark Twain"],
+                    "correctAnswer": "William Shakespeare"
+                },
+                {
+                    "question": "What is the chemical symbol for water?",
+                    "options": ["O2", "H2O", "CO2", "NaCl"],
+                    "correctAnswer": "H2O"
+                }
+            ]
+        else:  # Short Questions
+            quiz_data = [
+                {
+                    "question": "What is the boiling point of water in Celsius?",
+                    "correctAnswer": "100"
+                },
+                {
+                    "question": "Who was the first President of the United States?",
+                    "correctAnswer": "George Washington"
+                },
+                {
+                    "question": "What is the most spoken language in the world?",
+                    "correctAnswer": "Mandarin Chinese"
+                },
+                {
+                    "question": "In which year did the Titanic sink?",
+                    "correctAnswer": "1912"
+                },
+                {
+                    "question": "What is the currency of Japan?",
+                    "correctAnswer": "Yen"
+                }
+            ]
+        
+
+        return jsonify({"quiz": quiz_data})
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+# ======================================================================
+# END: NEW QUIZ GENERATION CODE
+# ======================================================================
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='192.168.0.105', port=5000)

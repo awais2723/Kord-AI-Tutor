@@ -1,12 +1,10 @@
 import { Component } from 'react';
 import { View, TouchableOpacity, Image, Text } from 'react-native';
-import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons'; // or 'react-native-vector-icons'
+import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import { AuthContext, AuthContextType } from '@/context';
-import styles from '@/src/styles';
 import { doSignOut } from '@/firebase/auth';
-import { solveProblem } from '../../utils/openAiClient';
 
 type Props = object;
 
@@ -14,28 +12,17 @@ class MyProfileScreen extends Component<Props> {
   static contextType = AuthContext;
   declare context: AuthContextType;
 
-  handleSettings = async () => {
-    console.log('settings clicked');
-  };
-
-  handleHelpCenter = () => {
-    console.log('Navigate to Help Center');
-  };
-
-  handleAboutUs = () => {
-    console.log('Navigate to About Us');
-    // const auth = getAuth();
-  };
-
+  handleSettings = () => console.log('settings clicked');
+  handleHelpCenter = () => console.log('Navigate to Help Center');
+  handleAboutUs = () => console.log('Navigate to About Us');
   handleLogout = () => {
     console.log('User logged out');
     try {
       doSignOut();
-      router.push('/login'); // navigate to login screen after logout
+      router.push('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }
-    // Add logout logic here
   };
 
   render() {
@@ -54,7 +41,7 @@ class MyProfileScreen extends Component<Props> {
           <Text className="text-black font-bold text-xl ml-4 capitalize">
             {currentUser?.displayName}
           </Text>
-          <View className=" w-18 ml-auto mr-2 flex-row items-center border-2 border-primary rounded-md p-1">
+          <View className="w-18 ml-auto mr-2 flex-row items-center border-2 border-primary rounded-md p-1">
             <Text className="text-black font-bold text-lg mr-2">10</Text>
             <Image source={require('../assets/images/gem.png')} className="w-6 h-6" />
           </View>
@@ -62,10 +49,10 @@ class MyProfileScreen extends Component<Props> {
 
         {/* Premium Card */}
         <View className="items-center">
-          <View style={styles.shadow} className="w-11/12 h-48 mt-4">
+          <View className="w-11/12 h-48 mt-4 shadow-lg rounded-2xl overflow-hidden">
             <Image
               source={require('../assets/images/premiumPicture.jpg')}
-              className="w-full h-full rounded-2xl shadow-2xl"
+              className="w-full h-full"
             />
             <TouchableOpacity className="bg-yellow-300 absolute bottom-3 w-48 h-8 rounded-2xl justify-center items-center self-center">
               <Text className="text-black font-bold text-lg">Upgrade to Premium</Text>
@@ -98,7 +85,7 @@ class MyProfileScreen extends Component<Props> {
         </View>
 
         {/* Logout Button */}
-        <View className="mt-12 mb-10  items-center">
+        <View className="mt-12 mb-10 items-center">
           <TouchableOpacity
             className="bg-white px-6 py-3 rounded-2xl shadow-md flex-row items-center"
             onPress={this.handleLogout}>
