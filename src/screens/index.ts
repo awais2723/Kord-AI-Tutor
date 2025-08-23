@@ -18,4 +18,5 @@ export { default as ShowResultScreen } from './ShowResultScreen';
 export {default as McqsQuizScreen }  from './mcqsQuizScreen';
 export {default as QuestionQuizScreen }  from './questionQuizScreen';
 export {default as McqsResultScreen }  from './McqsResultScreen';
+export {default as QuestionResultScreen }  from './QuestionResultScreen';
 

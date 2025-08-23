@@ -24,6 +24,27 @@ export default function StackQuizLayout() {
           headerTitleStyle: { color: 'white' },
         }}
       />
+      <Stack.Screen
+        name="mcqsResult"
+        options={{
+          headerShown: true,
+          title: 'Result',
+          headerStyle: { backgroundColor: '#6844EE' },
+          headerTintColor: 'white',
+          headerTitleStyle: { color: 'white' },
+        }}
+      />
+
+      <Stack.Screen
+        name="questionResult"
+        options={{
+          headerShown: true,
+          title: 'Result',
+          headerStyle: { backgroundColor: '#6844EE' },
+          headerTintColor: 'white',
+          headerTitleStyle: { color: 'white' },
+        }}
+      />
     </Stack>
   );
 }

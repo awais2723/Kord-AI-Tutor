@@ -200,7 +200,7 @@ def generate_quiz():
         # Define the expected JSON structure based on the quiz type
         if quiz_type == 'MCQs':
             json_format_instructions = """
-            [
+            "questions": [
               {
                 "question": "The question text...",
                 "options": ["Option A", "Option B", "Option C", "Option D"],
@@ -210,115 +210,220 @@ def generate_quiz():
             """
         else:  # Short Questions
             json_format_instructions = """
-            [
+            "questions": [
               {
-                "question": "The question text...",
-                
+                "question": "The question text..."
               }
             ]
             """
 
-        # Construct a detailed prompt for the AI model
-        # prompt = f"""
-        # Generate a {difficulty} level quiz with 5 questions on the topic of "{topic}".
-        # The quiz type must be "{quiz_type}".
-        # Your entire response must be a single, valid JSON array, with no other text or explanations.
-        # Follow this exact JSON structure:
-        # {json_format_instructions}
-        # """
+        # Construct a more robust prompt for the AI model
+        prompt = f"""
+        Generate a {difficulty} level quiz with 5 questions on the topic of "{topic}".
+        The quiz type must be "{quiz_type}".
+        Your entire response must be a single, valid JSON object.
+        The JSON object must have a single key called "questions", which contains an array of the question objects.
+        Do not include any other text, explanations, or markdown.
+        Follow this exact structure inside the JSON object:
+        {json_format_instructions}
+        """
 
-        # response = client.chat.completions.create(
-        #     model="gpt-3.5-turbo",  # Using a model that supports JSON mode
-        #     response_format={"type": "json_object"},
-        #     messages=[
-        #         {"role": "system", "content": "You are an API that generates quizzes in a specified JSON format."},
-        #         {"role": "user", "content": prompt}
-        #     ],
-        #     temperature=0.6,
-        # )
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": "You are an API that generates quizzes in a specified JSON format. You will only respond with the JSON object."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.6,
+        )
 
-        # quiz_content = response.choices[0].message.content
-   
-        # The AI should return a JSON string. Parse it into a Python object.
-        # try:
-        #     quiz_data = json.loads(quiz_content)
-        #     # Sometimes the model wraps the list in a key, like {"questions": [...]}. Let's find the list.
-        #     if isinstance(quiz_data, dict):
-        #         list_values = [v for v in quiz_data.values() if isinstance(v, list)]
-        #         if list_values:
-        #             quiz_data = list_values[0] # Take the first list found
-        #         else:
-        #             raise ValueError("JSON from AI is a dictionary but contains no list of questions.")
-        # except (json.JSONDecodeError, ValueError) as e:
-        #     print("Error parsing AI response:", e)
-        #     print("Raw AI response received:", quiz_content)
-        #     return jsonify({"error": "Failed to parse the generated quiz from AI."}), 500
+        quiz_content = response.choices[0].message.content
+        print(quiz_content)
+    
+        try:
+            # The AI should return a JSON string. Parse it into a Python object.
+            quiz_data = json.loads(quiz_content)
+            
+            # Now, we specifically look for the "questions" key, which should be a list.
+            if isinstance(quiz_data, dict) and "questions" in quiz_data and isinstance(quiz_data["questions"], list):
+                # We extract the list of questions and send that back to the client.
+                quiz_data = quiz_data["questions"]
+                print(quiz_data)
+                return jsonify({"quiz": quiz_data}), 200
+            else:
+                # This error is more specific if the AI fails to follow the new structure.
+                raise ValueError("JSON from AI does not contain a 'questions' list.")
+
+        except (json.JSONDecodeError, ValueError) as e:
+            print("Error parsing AI response:", e)
+            print("Raw AI response received:", quiz_content)
+            return jsonify({"error": "Failed to parse the generated quiz from AI."}), 500
+
+    except Exception as e:
+        print(f"An unexpected error occurred in /generate-quiz: {e}")
+        return jsonify({"error": "An internal server error occurred."}), 500
 
         quiz_data = []
         
         # --- DUMMY DATA FOR TESTING ---
-        if quiz_type == 'MCQs':
-            quiz_data = [
-                {
-                    "question": "What is the capital of France?",
-                    "options": ["Berlin", "Madrid", "Paris", "Rome"],
-                    "correctAnswer": "Paris"
-                },
-                {
-                    "question": "Which planet is known as the Red Planet?",
-                    "options": ["Earth", "Mars", "Jupiter", "Venus"],
-                    "correctAnswer": "Mars"
-                },
-                {
-                    "question": "What is the largest ocean on Earth?",
-                    "options": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
-                    "correctAnswer": "Pacific Ocean"
-                },
-                {
-                    "question": "Who wrote 'Hamlet'?",
-                    "options": ["Charles Dickens", "William Shakespeare", "Leo Tolstoy", "Mark Twain"],
-                    "correctAnswer": "William Shakespeare"
-                },
-                {
-                    "question": "What is the chemical symbol for water?",
-                    "options": ["O2", "H2O", "CO2", "NaCl"],
-                    "correctAnswer": "H2O"
-                }
-            ]
-        else:  # Short Questions
-            quiz_data = [
-                {
-                    "question": "What is the boiling point of water in Celsius?",
-                    "correctAnswer": "100"
-                },
-                {
-                    "question": "Who was the first President of the United States?",
-                    "correctAnswer": "George Washington"
-                },
-                {
-                    "question": "What is the most spoken language in the world?",
-                    "correctAnswer": "Mandarin Chinese"
-                },
-                {
-                    "question": "In which year did the Titanic sink?",
-                    "correctAnswer": "1912"
-                },
-                {
-                    "question": "What is the currency of Japan?",
-                    "correctAnswer": "Yen"
-                }
-            ]
+        # if quiz_type == 'MCQs':
+        #     quiz_data = [
+        #         {
+        #             "question": "What is the capital of France?",
+        #             "options": ["Berlin", "Madrid", "Paris", "Rome"],
+        #             "correctAnswer": "Paris"
+        #         },
+        #         {
+        #             "question": "Which planet is known as the Red Planet?",
+        #             "options": ["Earth", "Mars", "Jupiter", "Venus"],
+        #             "correctAnswer": "Mars"
+        #         },
+        #         {
+        #             "question": "What is the largest ocean on Earth?",
+        #             "options": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+        #             "correctAnswer": "Pacific Ocean"
+        #         },
+        #         {
+        #             "question": "Who wrote 'Hamlet'?",
+        #             "options": ["Charles Dickens", "William Shakespeare", "Leo Tolstoy", "Mark Twain"],
+        #             "correctAnswer": "William Shakespeare"
+        #         },
+        #         {
+        #             "question": "What is the chemical symbol for water?",
+        #             "options": ["O2", "H2O", "CO2", "NaCl"],
+        #             "correctAnswer": "H2O"
+        #         }
+        #     ]
+        # else:  # Short Questions
+        #     quiz_data = [
+        #         {
+        #             "question": "What is the boiling point of water in Celsius?",
+        #             "correctAnswer": "100"
+        #         },
+        #         {
+        #             "question": "Who was the first President of the United States?",
+        #             "correctAnswer": "George Washington"
+        #         },
+        #         {
+        #             "question": "What is the most spoken language in the world?",
+        #             "correctAnswer": "Mandarin Chinese"
+        #         },
+        #         {
+        #             "question": "In which year did the Titanic sink?",
+        #             "correctAnswer": "1912"
+        #         },
+        #         {
+        #             "question": "What is the currency of Japan?",
+        #             "correctAnswer": "Yen"
+        #         }
+        #     ]
         
 
-        return jsonify({"quiz": quiz_data})
+        # return jsonify({"quiz": quiz_data})
 
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+    # except Exception as e:
+    #     traceback.print_exc()
+    #     return jsonify({"error": str(e)}), 500
 # ======================================================================
 # END: NEW QUIZ GENERATION CODE
 # ======================================================================
 
 
+@app.route("/evaluate-answers", methods=["POST"])
+@cross_origin()
+def evaluate_answers():
+    """
+    Receives a batch of questions and answers, gets scores from an AI model,
+    and returns the complete, evaluated results.
+    """
+    print("got request")
+    try:
+        data = request.get_json()
+        # Expecting a structure like: { "answers": [{"question": "...", "answer": "..."}, ...] }
+        user_answers = data.get("answers")
+
+        if not user_answers or not isinstance(user_answers, list):
+            return jsonify({"error": "Missing or invalid 'answers' field"}), 400
+
+        # Prepare the answers for the prompt in a numbered list format for clarity
+        answers_formatted_string = ""
+        for i, item in enumerate(user_answers):
+            answers_formatted_string += f"{i+1}. Question: {item.get('question')}\n   Answer: {item.get('answer')}\n"
+
+        # Define the expected JSON structure for the AI's response
+        json_format_instructions = """
+        [
+          { "score": <A number from 1 to 5> },
+          { "score": <A number from 1 to 5> }
+        ]
+        """
+
+        # Construct a detailed prompt for the AI model
+        prompt = f"""
+        I will provide a list of questions and user-submitted answers.
+        Evaluate each answer based on its quality and accuracy on a scale of 1 to 5, where 1 is poor and 5 is excellent.
+        Your entire response must be a single, valid JSON array of objects, with no other text or explanations.
+        The array must have the exact same number of items as the number of answers I provide.
+        Follow this exact JSON structure:
+        {json_format_instructions}
+
+        Here are the questions and answers to evaluate:
+        {answers_formatted_string}
+        """
+
+      
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": "You are an API that evaluates quiz answers and returns scores in a specified JSON format."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.4, # Lower temperature for more deterministic scoring
+        )
+
+        evaluation_content = response.choices[0].message.content
+
+        try:
+            evaluation_data = json.loads(evaluation_content)
+            scores_list = []
+            # The model might wrap the list in a key, e.g., {"scores": [...]}. This handles that.
+            if isinstance(evaluation_data, dict):
+                list_values = [v for v in evaluation_data.values() if isinstance(v, list)]
+                if list_values:
+                    scores_list = list_values[0]
+                else:
+                    raise ValueError("JSON from AI is a dictionary but contains no list of scores.")
+            elif isinstance(evaluation_data, list):
+                scores_list = evaluation_data
+            else:
+                 raise ValueError("Unexpected JSON format from AI.")
+
+            # Validate that the number of scores matches the number of answers
+            if len(scores_list) != len(user_answers):
+                 return jsonify({"error": "AI returned a mismatched number of scores."}), 500
+
+            # Combine the original questions and answers with the new scores
+            final_results = []
+            for i, item in enumerate(user_answers):
+                final_results.append({
+                    "question": item.get('question'),
+                    "answer": item.get('answer'),
+                    "score": scores_list[i].get('score', 0) # Default to 0 if score key is missing
+                })
+
+            return jsonify(final_results), 200
+
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"Error parsing AI response: {e}")
+            print(f"Raw AI response received: {evaluation_content}")
+            return jsonify({"error": "Failed to parse the evaluation from AI."}), 500
+
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return jsonify({"error": "An internal server error occurred."}), 500
+
+
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.0.105', port=5000)
+    app.run(debug=True, host='192.168.0.106', port=5000)

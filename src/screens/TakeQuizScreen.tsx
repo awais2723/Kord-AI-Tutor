@@ -92,14 +92,7 @@ class TakeQuizScreen extends Component<Props, State> {
         throw new Error(data.error || 'An unknown server error occurred.');
       }
 
-      // 3. Navigate to the QuizScreen on success, passing the generated quiz data
-      // You will need to create this 'QuizScreen' component.
-      // navigation.navigate('QuizScreen', {
-      //   quizData: data.quiz,
-      //   topic: explanation
-      // });
-      // ... inside handleStartQuiz, after you successfully fetch the data ...
-
+  
       const quizData = data.quiz;
 
       if (!quizData) {
