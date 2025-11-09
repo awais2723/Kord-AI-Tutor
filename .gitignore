@@ -8,6 +8,15 @@ node_modules/
 dist/
 web-build/
 
+/android/app/build/
+/android/.gradle/
+/android/build/
+/android/app/release/
+/android/app/debug/
+/android/.idea/
+*.apk
+*.aab
+
 # Environment variables
 # .env
 
