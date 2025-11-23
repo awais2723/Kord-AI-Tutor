@@ -5,28 +5,28 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { router } from 'expo-router'; // This import is redundant if using useRouter()
 
 // Define the structure of a single question
-interface McqQuestion {
+type McqQuestion = {
   question: string;
   options: string[];
   correctAnswer: string;
-}
+};
 
 // Define the structure for a user's answer
-interface UserAnswer {
+type UserAnswer = {
   question: string;
   selectedAnswer: string;
   correctAnswer: string;
   isCorrect: boolean;
-}
+};
 
 // Define the type for the parameters expected by the /mcqsResult route
 // This interface is still useful for documenting the shape of the params
 // but it's not directly applied as a generic to useRouter() anymore.
-interface McqsResultParams {
+type McqsResultParams = {
   score: number;
   totalQuestions: number;
   results: string; // JSON stringified array
-}
+};
 
 const McqsQuizScreen = () => {
   const params = useLocalSearchParams();
@@ -77,7 +77,7 @@ const McqsQuizScreen = () => {
       const selectedAnswer = selectedAnswers[index] || 'Not Answered';
       return {
         question: question.question,
-        selectedAnswer: selectedAnswer,
+        selectedAnswer,
         correctAnswer: question.correctAnswer,
         isCorrect: selectedAnswer.toLowerCase() === question.correctAnswer.toLowerCase(),
       };
@@ -89,7 +89,7 @@ const McqsQuizScreen = () => {
     router.push({
       pathname: '/mcqsResult',
       params: {
-        score: score,
+        score,
         totalQuestions: quizData.length,
         results: JSON.stringify(results),
       },

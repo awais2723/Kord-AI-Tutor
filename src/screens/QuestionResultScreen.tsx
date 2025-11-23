@@ -12,11 +12,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Svg, Circle } from 'react-native-svg';
 
 // Define the structure for an evaluated answer
-interface EvaluatedAnswer {
+type EvaluatedAnswer = {
   question: string;
   answer: string;
   score: number; // Score out of 5
-}
+};
 
 const QuestionResultScreen = () => {
   const params = useLocalSearchParams();

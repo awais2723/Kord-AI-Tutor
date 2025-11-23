@@ -4,6 +4,7 @@ import {
   DefaultTheme as NavigationLightTheme,
   Theme as NavigationTheme,
 } from '@react-navigation/native';
+
 import { Colors } from './Colors';
 
 export type CombinedTheme = PaperTheme & NavigationTheme;

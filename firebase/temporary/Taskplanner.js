@@ -18,7 +18,6 @@ import {
   Switch,
   Platform,
 } from 'react-native';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TASK_KEY = '@rn_tasks_v1';

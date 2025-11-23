@@ -60,7 +60,7 @@ export const doPasswordChange = async (password: string) => {
 export const doUpdateProfile = async (displayName: string) => {
   if (auth.currentUser) {
     await updateProfile(auth.currentUser, {
-      displayName: displayName,
+      displayName,
     });
   }
 };

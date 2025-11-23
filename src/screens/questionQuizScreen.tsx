@@ -13,19 +13,20 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
+
 import { SERVER_END_POINT } from '@/constants';
 
 // Define the structure of a single question
-interface Question {
+type Question = {
   question: string;
-}
+};
 
 // Define the structure for a user's answer with AI evaluation
-interface EvaluatedAnswer {
+type EvaluatedAnswer = {
   question: string;
   answer: string;
   score: number; // Score out of 5 from AI
-}
+};
 
 const QuestionQuizScreen = () => {
   const params = useLocalSearchParams();

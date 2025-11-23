@@ -103,7 +103,7 @@ class TakeQuizScreen extends Component<Props, State> {
 
       // Use the router to push to the correct screen
       router.push({
-        pathname: pathname,
+        pathname,
         params: {
           // Ensure you are stringifying the correct variable
           quizData: JSON.stringify(quizData),

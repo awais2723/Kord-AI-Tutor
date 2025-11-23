@@ -91,7 +91,6 @@ class ScanQuestionScreen extends Component<Props, State> {
       // User closed the camera without capturing
       this.setState({ loading: false });
       router.back(); // or router.back();
-      return;
     }
   };
 

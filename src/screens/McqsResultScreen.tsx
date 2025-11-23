@@ -13,12 +13,12 @@ import { Svg, Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 
 // Define the structure for a user's answer
-interface UserAnswer {
+type UserAnswer = {
   question: string;
   selectedAnswer: string;
   correctAnswer: string;
   isCorrect: boolean;
-}
+};
 
 const McqsResultScreen = () => {
   const params = useLocalSearchParams();
