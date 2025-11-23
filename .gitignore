@@ -56,3 +56,4 @@ coverage/
 # @end expo-cli
 
 server/venv
+server/.env
