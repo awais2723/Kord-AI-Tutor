@@ -13,12 +13,7 @@ import {
   Platform,
 } from 'react-native';
 
-import {
-  doSendEmailVerification,
-  doSignInWithEmailAndPassword,
-  getErrorMessage,
-  doPasswordReset,
-} from '@/firebase/auth';
+import { doSignInWithEmailAndPassword, getErrorMessage, doPasswordReset } from '@/firebase/auth';
 
 type Props = object;
 
@@ -87,9 +82,13 @@ class LoginScreen extends Component<Props, State> {
           error: '',
         },
       });
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.code
+        ? getErrorMessage(error.code)
+        : 'An error occurred. Please try again.';
+
       this.setState({
-        message: { success: '', error: getErrorMessage(error.code) },
+        message: { success: '', error: errorMessage },
       });
     } finally {
       this.setState({ loading: false });
@@ -116,15 +115,19 @@ class LoginScreen extends Component<Props, State> {
       const user = response.user;
 
       if (!user.emailVerified) {
-        await doSendEmailVerification(); // Pass user if needed by your function
+        // Redirect to email verification screen
         this.setState({
           loading: false,
           message: {
-            success: '',
-            error: 'Email not verified. Verification link sent. Please check your inbox.',
+            success: 'Please verify your email first. Redirecting...',
+            error: '',
           },
         });
-        return; // 🚨 Stop here — no redirect or "Login successfully"
+
+        setTimeout(() => {
+          router.replace('/email-verification');
+        }, 1500);
+        return;
       }
 
       // Email verified — allow login
@@ -135,7 +138,11 @@ class LoginScreen extends Component<Props, State> {
       });
 
       setTimeout(() => router.replace('/home'), 500);
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.code
+        ? getErrorMessage(error.code)
+        : 'Invalid email or password. Please try again.';
+
       this.setState({
         message: { success: '', error: getErrorMessage(error.code) },
         showPassword: true,

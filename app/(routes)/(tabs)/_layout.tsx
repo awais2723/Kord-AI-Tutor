@@ -25,6 +25,7 @@ const TabLayout = () => (
     screenOptions={{
       headerShown: false,
       tabBarActiveTintColor: '#6844EE',
+      tabBarHideOnKeyboard: true, // Hide tab bar when keyboard is open
 
       tabBarLabelStyle: {
         fontSize: 12,

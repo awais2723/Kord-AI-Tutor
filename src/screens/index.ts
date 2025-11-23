@@ -4,9 +4,12 @@ from 'filePath';` syntax. */
 export { default as SplashScreen } from '@/src/screens/SplashScreen';
 export { default as LoginScreen } from '@/src/screens/LoginScreen';
 export { default as SignupScreen } from '@/src/screens/SignupScreen';
+export { default as EmailVerificationScreen } from '@/src/screens/EmailVerificationScreen';
 export { default as HomeScreen } from '@/src/screens/HomeScreen';
 export { default as AccountScreen } from '@/src/screens/AccountScreen';
 export { default as SettingsScreen } from '@/src/screens/SettingsScreen';
+export { default as AboutScreen } from '@/src/screens/AboutScreen';
+export { default as HelpCenterScreen } from '@/src/screens/HelpCenterScreen';
 export { default as NotFoundScreen } from '@/src/screens/NotFoundScreen';
 export { default as TakeQuizScreen } from '@/src/screens/TakeQuizScreen';
 export { default as MyProfileScreen } from '@/src/screens/MyProfileScreen';
@@ -19,4 +22,3 @@ export {default as McqsQuizScreen }  from './mcqsQuizScreen';
 export {default as QuestionQuizScreen }  from './questionQuizScreen';
 export {default as McqsResultScreen }  from './McqsResultScreen';
 export {default as QuestionResultScreen }  from './QuestionResultScreen';
-

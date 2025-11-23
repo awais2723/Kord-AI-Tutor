@@ -12,9 +12,9 @@ class MyProfileScreen extends Component<Props> {
   static contextType = AuthContext;
   declare context: AuthContextType;
 
-  handleSettings = () => console.log('settings clicked');
-  handleHelpCenter = () => console.log('Navigate to Help Center');
-  handleAboutUs = () => console.log('Navigate to About Us');
+  handleSettings = () => router.push('/settings');
+  handleHelpCenter = () => router.push('/helpCenter');
+  handleAboutUs = () => router.push('/about');
   handleLogout = () => {
     console.log('User logged out');
     try {

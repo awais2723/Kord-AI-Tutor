@@ -17,11 +17,11 @@ const AuthRouteProvider: React.FC<Props> = ({ children }: Props) => {
   useEffect(() => {
     if (!loading) {
       if (userLoggedIn) {
-        if (pathname === '/login' || pathname === '/signup') {
+        if (pathname === '/login' || pathname === '/signup' || pathname === '/email-verification') {
           router.replace('/home');
         }
       } else {
-        if (pathname !== '/login' && pathname !== '/signup') {
+        if (pathname !== '/login' && pathname !== '/signup' && pathname !== '/email-verification') {
           router.replace('/login');
         }
       }
