@@ -92,7 +92,6 @@ class TakeQuizScreen extends Component<Props, State> {
         throw new Error(data.error || 'An unknown server error occurred.');
       }
 
-  
       const quizData = data.quiz;
 
       if (!quizData) {

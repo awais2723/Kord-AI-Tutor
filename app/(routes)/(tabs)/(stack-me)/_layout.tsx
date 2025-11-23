@@ -24,6 +24,26 @@ export default function StackMeLayout() {
           headerTitleStyle: { color: 'white' },
         }}
       />
+      <Stack.Screen
+        name="about"
+        options={{
+          headerShown: true,
+          title: 'About Us',
+          headerStyle: { backgroundColor: '#6844EE' },
+          headerTintColor: 'white',
+          headerTitleStyle: { color: 'white' },
+        }}
+      />
+      <Stack.Screen
+        name="helpCenter"
+        options={{
+          headerShown: true,
+          title: 'Help Center',
+          headerStyle: { backgroundColor: '#6844EE' },
+          headerTintColor: 'white',
+          headerTitleStyle: { color: 'white' },
+        }}
+      />
     </Stack>
   );
 }

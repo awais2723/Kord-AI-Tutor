@@ -39,4 +39,3 @@ export const clearAll = async () => {
     console.error('Error clearing storage:', e);
   }
 };
-

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
- import { router } from 'expo-router'; // This import is redundant if using useRouter()
+import { router } from 'expo-router'; // This import is redundant if using useRouter()
 
 // Define the structure of a single question
 interface McqQuestion {
@@ -31,7 +31,7 @@ interface McqsResultParams {
 const McqsQuizScreen = () => {
   const params = useLocalSearchParams();
   // Removed the generic type argument from useRouter() as it's not expected.
-  const router = useRouter(); 
+  const router = useRouter();
   console.log('Params received on McqsQuizScreen:', params);
 
   const { quizData, topic } = useMemo(() => {
@@ -41,12 +41,14 @@ const McqsQuizScreen = () => {
         parsedData = JSON.parse(params.quizData);
       }
     } catch (e) {
-      console.error("Failed to parse quiz data:", e);
-      Alert.alert("Error", "Could not load the quiz data.", [{ text: "OK", onPress: () => router.back() }]);
+      console.error('Failed to parse quiz data:', e);
+      Alert.alert('Error', 'Could not load the quiz data.', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
     }
     return {
       quizData: parsedData,
-      topic: typeof params.topic === 'string' ? params.topic : 'Quiz'
+      topic: typeof params.topic === 'string' ? params.topic : 'Quiz',
     };
   }, [params.quizData, params.topic]);
 
@@ -72,7 +74,7 @@ const McqsQuizScreen = () => {
 
   const handleSubmit = () => {
     const results: UserAnswer[] = quizData.map((question, index) => {
-      const selectedAnswer = selectedAnswers[index] || "Not Answered";
+      const selectedAnswer = selectedAnswers[index] || 'Not Answered';
       return {
         question: question.question,
         selectedAnswer: selectedAnswer,
@@ -126,10 +128,11 @@ const McqsQuizScreen = () => {
                 selectedAnswers[currentQuestionIndex] === option && styles.optionSelected,
               ]}
               onPress={() => handleOptionSelect(option)}>
-              <Text style={[
-                styles.optionText,
-                selectedAnswers[currentQuestionIndex] === option && styles.optionTextSelected
-              ]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  selectedAnswers[currentQuestionIndex] === option && styles.optionTextSelected,
+                ]}>
                 {option}
               </Text>
             </TouchableOpacity>
@@ -152,16 +155,45 @@ const McqsQuizScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   scrollContent: { padding: 20, flexGrow: 1 },
-  topicTitle: { fontSize: 28, fontWeight: 'bold', color: '#4F46E5', textAlign: 'center', marginBottom: 10 },
+  topicTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#4F46E5',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
   progressText: { fontSize: 16, color: '#6C757D', textAlign: 'center', marginBottom: 30 },
-  questionContainer: { backgroundColor: '#FFFFFF', padding: 20, borderRadius: 12, marginBottom: 30, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 2 },
+  questionContainer: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 2,
+  },
   questionText: { fontSize: 18, fontWeight: '500', color: '#212529', lineHeight: 26 },
   optionsContainer: { marginBottom: 20 },
-  optionButton: { backgroundColor: '#FFFFFF', padding: 15, borderRadius: 10, marginBottom: 10, borderWidth: 1, borderColor: '#DEE2E6' },
+  optionButton: {
+    backgroundColor: '#FFFFFF',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#DEE2E6',
+  },
   optionSelected: { backgroundColor: '#4F46E5', borderColor: '#4F46E5' },
   optionText: { fontSize: 16, color: '#343A40', fontWeight: '500' },
   optionTextSelected: { color: '#FFFFFF' },
-  nextButton: { backgroundColor: '#28A745', paddingVertical: 15, borderRadius: 12, alignItems: 'center', marginTop: 'auto' },
+  nextButton: {
+    backgroundColor: '#28A745',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 'auto',
+  },
   nextButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: 'bold' },
   disabledButton: { backgroundColor: '#AAB8C2' },
   errorText: { textAlign: 'center', marginTop: 50, fontSize: 18, color: 'red' },

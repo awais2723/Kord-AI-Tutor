@@ -56,7 +56,20 @@ class SignupScreen extends Component<Props, State> {
 
       if (user) {
         await doSendEmailVerification();
-        setTimeout(() => router.push('/home'), 3000);
+
+        this.setState({
+          username: '',
+          email: '',
+          password: '',
+          message: {
+            success: 'Account created! Redirecting to email verification...',
+            error: '',
+          },
+        });
+
+        // Redirect to email verification screen after showing success message
+        setTimeout(() => router.replace('/email-verification'), 2000);
+        return;
       }
 
       this.setState({
@@ -64,7 +77,7 @@ class SignupScreen extends Component<Props, State> {
         email: '',
         password: '',
         message: {
-          success: 'Registered successfully. Please check your email for verification.',
+          success: 'Registered successfully.',
           error: '',
         },
       });

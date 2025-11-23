@@ -1,5 +1,5 @@
 import { McqsResultScreen } from '@/src/screens';
 
-const Showpage = () => <McqsResultScreen/>;
+const Showpage = () => <McqsResultScreen />;
 
 export default Showpage;

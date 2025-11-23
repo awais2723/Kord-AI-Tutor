@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from 'expo-router';
 
-
 import TextContext from '@/context/TextContext';
 
 // Hook wrapper to hide tab bar when this screen is focused

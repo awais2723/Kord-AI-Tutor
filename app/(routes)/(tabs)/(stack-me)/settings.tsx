@@ -1,11 +1,5 @@
-import { HeaderContent } from '@/src/components';
 import { SettingsScreen } from '@/src/screens';
 
-const SettingsPage = () => (
-  <>
-    <HeaderContent />
-    <SettingsScreen />
-  </>
-);
+const SettingsPage = () => <SettingsScreen />;
 
 export default SettingsPage;

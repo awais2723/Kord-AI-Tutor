@@ -55,4 +55,3 @@ export const deleteData = async endpoint => {
     throw error;
   }
 };
-
