@@ -43,3 +43,26 @@ export async function solveProblem(inputText: string): Promise<string> {
   if (data.error) throw new Error(data.error);
   return data.answer;
 }
+
+
+export const solveMathProblem = async (text: string) => {
+  try {
+    const response = await fetch(`${SERVER_END_POINT}/solve-math`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ inputText: text }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data; // This is now an Object { overview, steps: [], finalAnswer }
+  } catch (error) {
+    console.error('Error solving problem:', error);
+    throw error;
+  }
+};

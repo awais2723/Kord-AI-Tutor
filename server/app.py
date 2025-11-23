@@ -11,7 +11,10 @@ import numpy as np
 import io
 from openai import OpenAI
 import json
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 # If you're on Windows, you will need to point pytesseract to the path where you installed Tesseract
 pytesseract.pytesseract.tesseract_cmd = r'tesseract'
@@ -37,7 +40,7 @@ def image_processing(image):
         # Read the image file into a numpy array
         img = np.array(image)
 
-        if img.ndim == 2:  # Grayscale image
+        if len(img.shape) == 2:  # Grayscale image
             gray = img
         elif img.shape[2] == 4:  # RGBA image
             gray = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
@@ -150,10 +153,11 @@ def image_to_text():
     return jsonify({'text': text_response}), 200
 #OpenAI integeration routes
 
-OPENAI_API_KEY = "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"
-OPENAI_ORG_ID = "org-urd4KrI8gjWN4Km3oZfK22Rg"
 
-client = OpenAI(api_key=OPENAI_API_KEY, organization=OPENAI_ORG_ID)
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    organization=os.getenv("OPENAI_ORGANIZATION")
+)
 
 @app.route("/solve-problem", methods=["POST"])
 @cross_origin()
@@ -180,10 +184,75 @@ def solve_problem():
         return jsonify({"answer": answer})
     
     except Exception as e:
+        print("CRITICAL ERROR IN SOLVE-PROBLEM:")
+        print(str(e))            # Prints the short error
+        traceback.print_exc()    # Prints the full location of the error
+        # ----------------------------------
         return jsonify({"error": str(e)}), 500
     
+
+
+@app.route("/solve-math", methods=["POST"])
+@cross_origin()
+def solve_math_problem():
+    try:
+        data = request.get_json()
+        input_text = data.get("inputText")
+
+        if not input_text:
+            return jsonify({"error": "Missing inputText"}), 400
+
+        # We strictly define the JSON structure we want
+        json_structure = """
+        {
+            "overview": "A brief 1-sentence summary of the answer.",
+            "steps": [
+                {
+                    "title": "Step 1: Identify the variables",
+                    "content": "Explanation here..."
+                },
+                {
+                    "title": "Step 2: Apply the Formula",
+                    "content": "Explanation here..."
+                }
+            ],
+            "finalAnswer": "The final result"
+        }
+        """
+
+        prompt = f"""
+        You are a helpful math tutor. Solve this problem: "{input_text}".
+        
+        Rules:
+        1. Break the solution down into logical steps.
+        2. Your response MUST be valid JSON.
+        3. Follow this exact structure:
+        {json_structure}
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo", # 1106 supports JSON mode well
+            response_format={"type": "json_object"}, # FORCE JSON
+            messages=[
+                {"role": "system", "content": "You are a math solver API that outputs JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+        )
+
+        answer_json_string = response.choices[0].message.content
+        
+        # Parse the string into a real Python dict to ensure it's valid before sending
+        answer_data = json.loads(answer_json_string)
+        
+        return jsonify(answer_data)
+    
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 500
+
 # ======================================================================
-# START: NEW QUIZ GENERATION CODE
+#  QUIZ GENERATION CODE
 # ======================================================================
 @app.route("/generate-quiz", methods=["POST"])
 @cross_origin()
@@ -426,4 +495,4 @@ def evaluate_answers():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.0.106', port=5000)
+    app.run(debug=True, host='192.168.1.114', port=5000)

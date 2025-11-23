@@ -178,7 +178,7 @@ class LoginScreen extends Component<Props, State> {
                 placeholder="Enter Email"
                 value={email}
                 onChangeText={text => this.setState({ email: text })}
-                className="border-2 text-gray-700 border-violet-700 rounded-md px-4 py-2"
+                className="border-2 text-gray-700 border-violet-700 rounded-md px-4 py-4 mb-8"
                 autoCapitalize="none"
                 keyboardType="email-address"
               />
@@ -191,10 +191,10 @@ class LoginScreen extends Component<Props, State> {
                   onChangeText={text => this.setState({ password: text })}
                   secureTextEntry={!showPassword}
                   autoCapitalize="none"
-                  className="border-2 text-gray-700 border-violet-700 rounded-md px-4 py-2 mb-4"
+                  className="border-2 text-gray-700 border-violet-700 rounded-md px-4 py-4 mb-2"
                 />
                 <TouchableOpacity
-                  className="absolute right-0 top-[18%] mr-3"
+                  className="absolute right-0 top-[22%] mr-3"
                   onPress={() => this.setState({ showPassword: !showPassword })}>
                   <Feather name={showPassword ? 'eye-off' : 'eye'} size={24} color="gray" />
                 </TouchableOpacity>
@@ -206,11 +206,11 @@ class LoginScreen extends Component<Props, State> {
               {message.error !== '' && <Text className="text-red-500 my-2">{message.error}</Text>}
 
               <TouchableOpacity className="flex items-end mb-12" onPress={this.forgotPassword}>
-                <Text className="text-violet-700 font-bold text-xl">Forgot Password?</Text>
+                <Text className="text-violet-700 font-bold text-l">Forgot Password?</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                className="border-2 bg-violet-700 text-gray-700 border-gray-300 rounded-lg px-4 py-2"
+                className=" bg-violet-700 text-gray-700 rounded-lg px-4 py-2"
                 onPress={this.handleLogin}>
                 {loading ? (
                   <ActivityIndicator size="large" color="white" />
@@ -221,7 +221,7 @@ class LoginScreen extends Component<Props, State> {
             </View>
           </View>
 
-          <View className="flex-row justify-center mt-2">
+          <View className="flex-row justify-center mt-1">
             <Text className="font-bold text-xl">Don&apos;t have an account?</Text>
             <Link href="/signup" asChild className="pl-2">
               <Text className="text-center text-violet-700 font-bold text-xl">Signup</Text>
