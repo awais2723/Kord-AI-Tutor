@@ -116,7 +116,7 @@ const QuestionQuizScreen = () => {
       const maxScore = quizData.length * 5;
 
       router.push({
-        pathname: '/questionResult',
+        pathname: '/(routes)/results/questionResult',
         params: {
           totalScore,
           maxScore,

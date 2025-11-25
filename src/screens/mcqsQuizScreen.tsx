@@ -87,7 +87,7 @@ const McqsQuizScreen = () => {
 
     // The router.push call remains the same, expo-router should infer its types.
     router.push({
-      pathname: '/mcqsResult',
+      pathname: '/(routes)/results/mcqsResult',
       params: {
         score,
         totalQuestions: quizData.length,

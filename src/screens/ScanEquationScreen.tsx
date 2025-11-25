@@ -1,7 +1,4 @@
-/* This code snippet is a React component called `ScanEquationScreen` that utilizes the `useState` and
-`useEffect` hooks from React. It also imports necessary components and modules such as `Platform`,
-`PermissionsAndroid`, `Image`, `Alert`, `View`, and `DocumentScanner` for handling document scanning
-functionality. */
+
 import { Component } from 'react';
 import { Platform, PermissionsAndroid, Image, Alert, View, ActivityIndicator } from 'react-native';
 import DocumentScanner from 'react-native-document-scanner-plugin';
@@ -11,6 +8,7 @@ import { router } from 'expo-router';
 
 import { SERVER_END_POINT } from '@/constants';
 import { TypeEquationScreen } from '@/src/screens';
+import TextContext from '@/context/TextContext';
 
 type Props = object;
 
@@ -21,6 +19,8 @@ type State = {
 };
 
 class ScanEquationScreen extends Component<Props, State> {
+  static contextType = TextContext;
+  declare context: React.ContextType<typeof TextContext>;
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -33,6 +33,8 @@ class ScanEquationScreen extends Component<Props, State> {
   componentDidMount() {
     this.scanDocument();
   }
+
+  removeExtraSpaces = (str: string) => str.trim().replace(/\s+/g, ' ');
 
   sendImage = async (uri: string) => {
     this.setState({ loading: true });
@@ -62,6 +64,9 @@ class ScanEquationScreen extends Component<Props, State> {
           this.setState({ latex: response.data.latex });
           this.setState({ loading: false });
           this.setState({ scannedImage: '' });
+          const cleanedText = this.removeExtraSpaces(response.data.text);
+          this.context.setText(cleanedText);
+          router.push('/(routes)/results/editScannedLatex');
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error('Error sending POST request:', error);

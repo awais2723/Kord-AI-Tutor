@@ -42,7 +42,7 @@ class HomeScreen extends Component<Props, State> {
     const { translateYAnimExit } = this.state;
     Animated.timing(translateYAnimExit, {
       toValue: -30,
-      duration: 150,
+      duration: 140,
       useNativeDriver: true,
     }).start(() => {
       translateYAnimExit.setValue(0);
@@ -59,7 +59,7 @@ class HomeScreen extends Component<Props, State> {
     const { translateXAnimEnter } = this.state;
     Animated.timing(translateXAnimEnter, {
       toValue: 0,
-      duration: 150,
+      duration: 140,
       useNativeDriver: true,
     }).start(() => {
       setTimeout(() => {

@@ -125,9 +125,6 @@ class TakeQuizScreen extends Component<Props, State> {
       this.setState({ isLoading: false });
     }
   };
-  // ======================================================================
-  // END: NEW FUNCTION
-  // ======================================================================
 
   renderOption = (options: string[], selectedValue: string, onSelect: (val: string) => void) =>
     options.map(item => (
@@ -154,7 +151,7 @@ class TakeQuizScreen extends Component<Props, State> {
           <Text style={styles.label}>Topic</Text>
           <TextInput
             style={styles.textInput}
-            placeholder="e.g., Photosynthesis, The Roman Empire, etc."
+            placeholder="e.g., Photosynthesis,"
             multiline
             value={explanation}
             onChangeText={text => this.setState({ explanation: text })}

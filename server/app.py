@@ -495,4 +495,4 @@ def evaluate_answers():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.1.114', port=5000)
+    app.run(debug=True, host='192.168.0.100', port=5000)

@@ -14,7 +14,7 @@ export default function StackLayout() {
           headerTitleStyle: { color: 'white' },
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="editScannedText"
         options={{
           headerShown: true,
@@ -23,7 +23,7 @@ export default function StackLayout() {
           headerTintColor: 'white',
           headerTitleStyle: { color: 'white' },
         }}
-      />
+      /> */}
 
       <Stack.Screen
         name="showResult"

@@ -4,7 +4,11 @@ import { TakeQuizScreen } from '@/src/screens';
 const HistoryPage = () => (
   <>
     <HeaderContent />
-    <TakeQuizScreen />
+    <TakeQuizScreen navigation={{
+      navigate: function (screen: string, params?: object): void {
+        throw new Error('Function not implemented.');
+      }
+    }} />
   </>
 );
 
