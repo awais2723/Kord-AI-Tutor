@@ -1,18 +1,16 @@
-import { Component, createRef, ReactElement, RefObject } from 'react';
-import { View } from 'react-native';
+import React, { Component, createRef, RefObject } from 'react';
+import { View, Platform, ActivityIndicator } from 'react-native';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
 
 type Props = {
   html: string;
-  mathJaxOptions?: Record<string, any>;
-  contentLoader?: () => React.ReactElement;
   css?: {
     color?: string;
     backgroundColor?: string;
     fontSize?: string;
     lineHeight?: string;
     fontWeight?: string;
-    padding?: string;
+    fontFamily?: string;
   };
 };
 
@@ -28,132 +26,119 @@ class MathJax extends Component<Props, State> {
     super(props);
     this.webviewRef = createRef<WebView>();
     this.state = {
-      height: 1,
+      height: 100, // Initial placeholder height
       loading: true,
     };
   }
 
-  renderLoading = (): ReactElement | null => {
-    const { contentLoader: ContentLoader } = this.props;
-    if (ContentLoader) {
-      return <ContentLoader />;
-    }
-    return null;
-  };
-
   handleMessage = (event: WebViewMessageEvent): void => {
-    const newHeight = Number(event.nativeEvent.data);
-    this.setState({ height: newHeight, loading: false });
+    const data = Number(event.nativeEvent.data);
+    if (!isNaN(data) && data > 0) {
+      this.setState({ height: data, loading: false });
+    }
   };
 
   wrapMathjax = (content: string): string => {
-    const { mathJaxOptions, css } = this.props;
-    const defaultOptions = {
-      messageStyle: 'none',
-      showMathMenu: false,
-      extensions: ['tex2jax.js'],
-      jax: ['input/TeX', 'output/CommonHTML'],
-      tex2jax: {
-        inlineMath: [
-          ['$', '$'],
-          ['\\(', '\\)'],
-        ],
-        displayMath: [
-          ['$$', '$$'],
-          ['\\[', '\\]'],
-        ],
-        processEscapes: true,
-      },
-      TeX: {
-        extensions: ['AMSmath.js', 'AMSsymbols.js', 'noErrors.js', 'noUndefined.js'],
-      },
-      CommonHTML: {
-        linebreaks: { automatic: true },
-      },
-      styles: {
-        '.MathJax_Display': {
-          background: css?.backgroundColor || '#ffffff',
-        },
-        body: {
-          background: css?.backgroundColor || '#ffffff',
-        },
-      },
-    };
+    const { css } = this.props;
 
-    const options = JSON.stringify(Object.assign({}, defaultOptions, mathJaxOptions));
+    // 1. Sanitize/Escape backslashes for the HTML string context
+    // This ensures \frac doesn't disappear before MathJax sees it.
+    const safeContent = content.replace(/\\/g, '\\\\');
 
     return `
-      <html style="border: none; background:${css?.backgroundColor || '#ffffff'};">
+      <!DOCTYPE html>
+      <html>
         <head>
-          <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
           <style>
-            *{margin:0;padding:0;box-sizing:border-box}
-            #MathJax_Message {${css?.fontSize || '14px'}}
-            a {color: white !important;text-decoration: underline !important}
+            body {
+              margin: 0;
+              padding: 0;
+              background-color: ${css?.backgroundColor || 'transparent'};
+              color: ${css?.color || '#000000'};
+              font-family: ${css?.fontFamily || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'};
+              font-size: ${css?.fontSize || '16px'};
+              line-height: ${css?.lineHeight || '1.6'};
+              font-weight: ${css?.fontWeight || 'normal'};
+              overflow: hidden; /* Hide scrollbars so we calculate exact height */
+            }
+            #math-content {
+              display: none; /* Hide until rendered to prevent jump */
+              padding: 1px; /* Prevent collapse */
+            }
           </style>
-        </head>
-        <body style="display:contents;border:none;padding-bottom:100px;background:${
-          css?.backgroundColor || '#ffffff'
-        };">
-          <div id="formula" style="visibility:hidden;color:${
-            css?.color || '#000000'
-          };background:${css?.backgroundColor || '#ffffff'};font-size:${
-            css?.fontSize || '14px'
-          };padding:${css?.padding || 0};line-height:${css?.lineHeight || '20px'};font-weight:${
-            css?.fontWeight || 'bold'
-          };max-height:fit-content;max-width:fit-content;overflow:auto;border:none;display:flex;flex-direction:column;justify-content:start;align-items:start;row-gap:4px;">
-              ${content}
-          </div>
-          <script type="text/x-mathjax-config">
-          MathJax.Hub.Config(${options});
-          MathJax.Hub.Queue(function(){let height=document.getElementById("formula").scrollHeight;document.getElementById("formula").style.visibility="";window.ReactNativeWebView.postMessage(String(height))});
+          
+          <script>
+            window.MathJax = {
+              tex: {
+                inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
+                displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
+              },
+              startup: {
+                pageReady: () => {
+                  return MathJax.startup.defaultPageReady().then(() => {
+                    // 1. Math is rendered, show the div
+                    const content = document.getElementById("math-content");
+                    content.style.display = "block";
+                    
+                    // 2. Calculate height
+                    const height = content.scrollHeight;
+                    
+                    // 3. Send to React Native
+                    window.ReactNativeWebView.postMessage(String(height));
+                  });
+                }
+              }
+            };
           </script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+        </head>
+        <body>
+          <div id="math-content">
+            ${safeContent}
+          </div>
         </body>
       </html>
     `;
   };
 
   render() {
-    const { html, css, ...filteredProps } = this.props;
+    const { html, css } = this.props;
     const { height, loading } = this.state;
-
     const wrappedHtml = this.wrapMathjax(html);
 
     return (
-      <>
-        {loading && this.renderLoading()}
-        <View
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            height,
-            borderWidth: 0,
-            borderColor: 'transparent',
-            backgroundColor: css?.backgroundColor || '#ffffff',
-          }}>
-          <WebView
-            ref={this.webviewRef}
-            bounces={false}
-            overScrollMode="never"
-            scalesPageToFit={true}
-            scrollEnabled={false}
-            setBuiltInZoomControls={false}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            keyboardDisplayRequiresUserAction={false}
-            hideKeyboardAccessoryView={true}
-            textInteractionEnabled={false}
-            useWebView2={true}
-            thirdPartyCookiesEnabled={true}
-            startInLoadingState={false}
-            javaScriptEnabled={true}
-            originWhitelist={['*']}
-            onMessage={this.handleMessage}
-            source={{ html: wrappedHtml }}
-            {...filteredProps}
-          />
-        </View>
-      </>
+      <View style={{ height, opacity: loading ? 0 : 1 }}>
+        <WebView
+          ref={this.webviewRef}
+          originWhitelist={['*']}
+          source={{
+            html: wrappedHtml,
+            // Crucial for Android to load the CDN script
+            baseUrl: Platform.OS === 'android' ? 'file:///android_asset/' : '',
+          }}
+          onMessage={this.handleMessage}
+          javaScriptEnabled={true}
+          scrollEnabled={false}
+          showsVerticalScrollIndicator={false}
+          style={{ backgroundColor: css?.backgroundColor || 'transparent' }}
+        />
+        {/* Optional: Placeholder while loading */}
+        {loading && (
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <ActivityIndicator color={css?.color || 'gray'} />
+          </View>
+        )}
+      </View>
     );
   }
 }

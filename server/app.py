@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from PIL import Image
+from PIL import Image,ImageOps
 import base64
 import traceback
 from pix2tex.cli import LatexOCR
@@ -63,6 +63,23 @@ def image_processing(image):
     except Exception as e:
         raise ValueError(f"Error in image processing: {str(e)}")
 
+
+
+def image_processing2(image):
+    """
+    Minimal processing for LatexOCR.
+    """
+    # 1. Convert to RGB (standard for most ML models)
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+    
+    # 2. (Optional) Resize if the image is massive (e.g. > 2000px width) to speed up
+    # Standard phone photos are fine, but ensure it's not tiny.
+    
+    return image
+
+
+
 @app.route('/')
 @cross_origin()
 def home():
@@ -74,42 +91,98 @@ def home():
     """
     return 'Server is running!'
 
+# @app.route('/latex', methods=['POST'])
+# @cross_origin()
+# def image_to_latex():
+#     """
+#     Endpoint to convert an uploaded image to LaTeX.
+
+#     This function handles POST requests to the /latex URL. It expects a JSON payload
+#     containing the image data in Base64 format. The image data should be included in 
+#     the 'uri' field of the JSON object.
+
+#     Returns:
+#         flask.Response: A JSON response with either the LaTeX code or an error message.
+#     """
+
+#     try:
+#         # Parse the JSON request body
+#         data = request.get_json()
+#         if not data or 'uri' not in data or 'type' not in data or 'name' not in data:
+#             return jsonify({'error': 'Invalid input data'}), 400
+
+#         # Decode the image data from the URI
+#         image_data = base64.b64decode(data['uri'].split(',')[1])
+#         image_file = Image.open(io.BytesIO(image_data))
+
+#         # Process the image
+#         img = image_processing2(image_file)
+
+#         # Convert the image to LaTeX format using the model
+#         latex_response = model(img)
+        
+#         # Convert LaTeX to plain text
+#         text_response = LatexNodes2Text().latex_to_text(latex_response)
+#         print("Text response on server:", text_response)
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 400
+    
+#     return jsonify({'latex': latex_response, 'text': text_response}), 200
+
+
+
+
 @app.route('/latex', methods=['POST'])
 @cross_origin()
 def image_to_latex():
-    """
-    Endpoint to convert an uploaded image to LaTeX.
-
-    This function handles POST requests to the /latex URL. It expects a JSON payload
-    containing the image data in Base64 format. The image data should be included in 
-    the 'uri' field of the JSON object.
-
-    Returns:
-        flask.Response: A JSON response with either the LaTeX code or an error message.
-    """
-
     try:
-        # Parse the JSON request body
         data = request.get_json()
-        if not data or 'uri' not in data or 'type' not in data or 'name' not in data:
+        if not data or 'uri' not in data:
             return jsonify({'error': 'Invalid input data'}), 400
 
-        # Decode the image data from the URI
-        image_data = base64.b64decode(data['uri'].split(',')[1])
-        image_file = Image.open(io.BytesIO(image_data))
+        # We don't even need to process/resize the image for GPT-4o
+        # It handles the base64 URI directly.
+        image_uri = data['uri'] 
 
-        # Process the image
-        img = image_processing(image_file)
+        prompt = """
+        Extract the mathematical content from this image. 
+        Return ONLY the raw LaTeX code. 
+        Do not add delimiters like ```latex or $$. 
+        If there is text mixed with math, wrap the text in \text{}.
+        """
 
-        # Convert the image to LaTeX format using the model
-        latex_response = model(img)
-        
-        # Convert LaTeX to plain text
-        text_response = LatexNodes2Text().latex_to_text(latex_response)
+        response = client.chat.completions.create(
+            model="gpt-4o", # Use gpt-4o or gpt-4-turbo
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": image_uri, # Send the data:image/jpeg;base64,... string directly
+                                "detail": "high"
+                            },
+                        },
+                    ],
+                }
+            ],
+            max_tokens=300,
+        )
+
+        latex_response = response.choices[0].message.content
+        print("OpenAI LaTeX:", latex_response)
+
+        return jsonify({'latex': latex_response, 'text': latex_response}), 200
+
     except Exception as e:
+        print("Error:", e)
         return jsonify({'error': str(e)}), 400
-    
-    return jsonify({'latex': latex_response, 'text': text_response}), 200
+
+
+
+
 
 @app.route('/text', methods=['POST'])
 @cross_origin()
@@ -198,35 +271,31 @@ def solve_math_problem():
     try:
         data = request.get_json()
         input_text = data.get("inputText")
-
+        
         if not input_text:
             return jsonify({"error": "Missing inputText"}), 400
 
         # We strictly define the JSON structure we want
         json_structure = """
         {
-            "overview": "A brief 1-sentence summary of the answer.",
+            "overview": "A brief summary. Use $...$ for math.",
             "steps": [
                 {
-                    "title": "Step 1: Identify the variables",
-                    "content": "Explanation here..."
-                },
-                {
-                    "title": "Step 2: Apply the Formula",
-                    "content": "Explanation here..."
+                    "title": "The Step Title",
+                    "content": "Explanation using standard text, but wrap ALL math equations in single dollar signs like $x^2$ or $\\frac{1}{2}$."
                 }
             ],
-            "finalAnswer": "The final result"
+            "finalAnswer": "The final result in math format like $x = 5$"
         }
         """
 
         prompt = f"""
         You are a helpful math tutor. Solve this problem: "{input_text}".
         
-        Rules:
-        1. Break the solution down into logical steps.
-        2. Your response MUST be valid JSON.
-        3. Follow this exact structure:
+        CRITICAL RULES FOR FORMATTING:
+        1.  **Use LaTeX for ALL math expressions.** Never use code syntax like 'x*y' or 'pi/4'.
+        2.  **Wrap ALL math in single dollar signs ($).** Example: "The function is $f(x) = x^2$."
+        3.   Response must be valid JSON matching this structure: Follow this exact structure:
         {json_structure}
         """
 
@@ -395,7 +464,7 @@ def generate_quiz():
     #     traceback.print_exc()
     #     return jsonify({"error": str(e)}), 500
 # ======================================================================
-# END: NEW QUIZ GENERATION CODE
+# END: QUIZ GENERATION CODE
 # ======================================================================
 
 

@@ -31,7 +31,7 @@ type McqsResultParams = {
 const McqsQuizScreen = () => {
   const params = useLocalSearchParams();
   // Removed the generic type argument from useRouter() as it's not expected.
-  const router = useRouter();
+  // const router = useRouter();
   console.log('Params received on McqsQuizScreen:', params);
 
   const { quizData, topic } = useMemo(() => {

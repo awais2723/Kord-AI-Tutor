@@ -34,7 +34,7 @@ class ScanEquationScreen extends Component<Props, State> {
     this.scanDocument();
   }
 
-  removeExtraSpaces = (str: string) => str.trim().replace(/\s+/g, ' ');
+  // removeExtraSpaces = (str: string) => str.trim().replace(/\s+/g, ' ');
 
   sendImage = async (uri: string) => {
     this.setState({ loading: true });
@@ -64,8 +64,8 @@ class ScanEquationScreen extends Component<Props, State> {
           this.setState({ latex: response.data.latex });
           this.setState({ loading: false });
           this.setState({ scannedImage: '' });
-          const cleanedText = this.removeExtraSpaces(response.data.text);
-          this.context.setText(cleanedText);
+          // const cleanedText = this.removeExtraSpaces(response.data.text);
+          this.context.setText(response.data.text);
           router.push('/(routes)/results/editScannedLatex');
         } catch (error) {
           // eslint-disable-next-line no-console
