@@ -47,13 +47,19 @@ export default function StackLayout() {
         }}
       />
       <Stack.Screen
-        name="typeEquation"
+        name="scanToPdf"
         options={{
           headerShown: true,
-          title: 'Type Equation',
+          title: 'Scan To PDF',
           headerStyle: { backgroundColor: '#6844EE' },
           headerTintColor: 'white',
           headerTitleStyle: { color: 'white' },
+        }}
+      />
+      <Stack.Screen
+        name="pdfPreview"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack>

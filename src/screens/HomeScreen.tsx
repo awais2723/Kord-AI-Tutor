@@ -105,7 +105,7 @@ class HomeScreen extends Component<Props, State> {
         <View className="bg-sky-50 flex-1 items-center pt-5">
           <TouchableOpacity
             style={styles.shadow}
-            className="w-11/12 h-18 bg-white rounded-lg flex-row mt-12 justify-center items-center"
+            className="w-11/12 h-18 bg-white rounded-lg flex-row mt-8 justify-center items-center"
             onPress={() => router.push('/scanQuestion')}>
             <MaterialCommunityIcons name="text-recognition" size={45} color="#6844EE" />
             <Text className="text-center text-2xl text-gray-900 font-bold ml-8">Scan Question</Text>
@@ -114,7 +114,7 @@ class HomeScreen extends Component<Props, State> {
 
           <TouchableOpacity
             style={styles.shadow}
-            className="w-11/12 h-18 bg-white rounded-lg flex-row mt-12 justify-center items-center"
+            className="w-11/12 h-18 bg-white rounded-lg flex-row mt-8 justify-center items-center"
             onPress={() => router.push('/scanEquation')}>
             <MaterialCommunityIcons name="math-integral" size={45} color="#6844EE" />
             <Text className="text-center text-2xl text-gray-900 font-bold ml-8">Scan Equation</Text>
@@ -122,10 +122,19 @@ class HomeScreen extends Component<Props, State> {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.shadow}
-            className="w-11/12 h-18 bg-white rounded-lg flex-row mt-12 justify-center items-center"
+            className="w-11/12 h-18 bg-white rounded-lg flex-row mt-8 justify-center items-center"
             onPress={() => router.push('/(routes)/results/typeEquation')}>
             <MaterialCommunityIcons name="math-norm-box" size={45} color="#6844EE" />
             <Text className="text-center text-2xl text-gray-900 font-bold ml-8">Type Equation</Text>
+            <MaterialIcons name="navigate-next" size={50} color="#6844EE" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.shadow}
+            className="w-11/12 h-18 bg-white rounded-lg flex-row mt-8 justify-center items-center"
+            onPress={() => router.push('/scanToPdf')}>
+            <MaterialCommunityIcons name="file-pdf-box" size={45} color="#6844EE" />
+            <Text className="text-center text-2xl text-gray-900 font-bold ml-8">Scan To PDF</Text>
             <MaterialIcons name="navigate-next" size={50} color="#6844EE" />
           </TouchableOpacity>
         </View>
