@@ -13,9 +13,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kordsnapandsolve.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +27,9 @@
       },
       "package": "com.kordsnapandsolve.app",
       "versionCode": 1,
-      "permissions": ["CAMERA"]
+      "permissions": [
+        "CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro",
