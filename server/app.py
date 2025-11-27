@@ -243,7 +243,7 @@ def solve_problem():
             return jsonify({"error": "Missing inputText"}), 400
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
@@ -264,7 +264,6 @@ def solve_problem():
         return jsonify({"error": str(e)}), 500
     
 
-
 @app.route("/solve-math", methods=["POST"])
 @cross_origin()
 def solve_math_problem():
@@ -275,51 +274,81 @@ def solve_math_problem():
         if not input_text:
             return jsonify({"error": "Missing inputText"}), 400
 
-        # We strictly define the JSON structure we want
-        json_structure = """
-        {
-            "overview": "A brief summary. Use $...$ for math.",
-            "steps": [
-                {
-                    "title": "The Step Title",
-                    "content": "Explanation using standard text, but wrap ALL math equations in single dollar signs like $x^2$ or $\\frac{1}{2}$."
-                }
-            ],
-            "finalAnswer": "The final result in math format like $x = 5$"
+        # Define the Strict Schema (The "Contract" with the AI)
+        math_schema = {
+            "name": "math_solution",
+            "strict": True, # <--- GUARANTEES the structure
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "overview": {
+                        "type": "string",
+                        "description": "A brief summary. Use $...$ for math."
+                    },
+                    "steps": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "title": {
+                                    "type": "string",
+                                    "description": "Short title of the step"
+                                },
+                                "content": {
+                                    "type": "string",
+                                    "description": "Detailed explanation. Use $ delimiters for ALL math symbols."
+                                }
+                            },
+                            "required": ["title", "content"],
+                            "additionalProperties": False
+                        }
+                    },
+                    "finalAnswer": {
+                        "type": "string",
+                        "description": "The final result in math format like $x = 5$"
+                    }
+                },
+                "required": ["overview", "steps", "finalAnswer"],
+                "additionalProperties": False
+            }
         }
-        """
 
         prompt = f"""
-        You are a helpful math tutor. Solve this problem: "{input_text}".
+        Solve this math problem: "{input_text}".
         
-        CRITICAL RULES FOR FORMATTING:
-        1.  **Use LaTeX for ALL math expressions.** Never use code syntax like 'x*y' or 'pi/4'.
-        2.  **Wrap ALL math in single dollar signs ($).** Example: "The function is $f(x) = x^2$."
-        3.   Response must be valid JSON matching this structure: Follow this exact structure:
-        {json_structure}
+        CRITICAL RULES:
+        1. Use LaTeX for ALL math expressions, wrapped in single dollar signs ($).
+        2. Example: "The integral is $\\int x dx$".
+        3.  **Use LaTeX commands** for functions. 
+            - WRONG: "sin(x)", "cos(x)", "pi"
+            - CORRECT: "\\sin(x)", "\\cos(x)", "\\pi"
+        4.  **Wrap ALL math in single dollar signs ($).** - Example: "The derivative of $f(x)$ is $f'(x)$."
+        5.  **Final Answer:** Must be fully wrapped in LaTeX delimiters.
+            - Example: "$x = \\frac{{\\pi}}{{2}}$"
         """
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo", # 1106 supports JSON mode well
-            response_format={"type": "json_object"}, # FORCE JSON
+            model="gpt-4o-2024-08-06", # Specific version optimized for strict outputs
             messages=[
-                {"role": "system", "content": "You are a math solver API that outputs JSON."},
+                {"role": "system", "content": "You are a precise math tutor."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.3,
+            response_format={
+                "type": "json_schema",
+                "json_schema": math_schema
+            },
+            temperature=0.1, 
         )
 
         answer_json_string = response.choices[0].message.content
-        
-        # Parse the string into a real Python dict to ensure it's valid before sending
         answer_data = json.loads(answer_json_string)
-        
+        print("Math solution data:", answer_data)
         return jsonify(answer_data)
     
     except Exception as e:
         print("Error:", e)
         return jsonify({"error": str(e)}), 500
-
+    
 # ======================================================================
 #  QUIZ GENERATION CODE
 # ======================================================================
@@ -367,7 +396,7 @@ def generate_quiz():
         """
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             response_format={"type": "json_object"},
             messages=[
                 {"role": "system", "content": "You are an API that generates quizzes in a specified JSON format. You will only respond with the JSON object."},
@@ -466,101 +495,98 @@ def generate_quiz():
 # ======================================================================
 # END: QUIZ GENERATION CODE
 # ======================================================================
-
-
 @app.route("/evaluate-answers", methods=["POST"])
 @cross_origin()
 def evaluate_answers():
-    """
-    Receives a batch of questions and answers, gets scores from an AI model,
-    and returns the complete, evaluated results.
-    """
-    print("got request")
     try:
         data = request.get_json()
-        # Expecting a structure like: { "answers": [{"question": "...", "answer": "..."}, ...] }
         user_answers = data.get("answers")
 
         if not user_answers or not isinstance(user_answers, list):
             return jsonify({"error": "Missing or invalid 'answers' field"}), 400
 
-        # Prepare the answers for the prompt in a numbered list format for clarity
+        # Format inputs
         answers_formatted_string = ""
         for i, item in enumerate(user_answers):
             answers_formatted_string += f"{i+1}. Question: {item.get('question')}\n   Answer: {item.get('answer')}\n"
 
-        # Define the expected JSON structure for the AI's response
-        json_format_instructions = """
-        [
-          { "score": <A number from 1 to 5> },
-          { "score": <A number from 1 to 5> }
-        ]
-        """
-
-        # Construct a detailed prompt for the AI model
         prompt = f"""
-        I will provide a list of questions and user-submitted answers.
-        Evaluate each answer based on its quality and accuracy on a scale of 1 to 5, where 1 is poor and 5 is excellent.
-        Your entire response must be a single, valid JSON array of objects, with no other text or explanations.
-        The array must have the exact same number of items as the number of answers I provide.
-        Follow this exact JSON structure:
-        {json_format_instructions}
-
-        Here are the questions and answers to evaluate:
+        Evaluate these user answers based on accuracy (1-5).
+        For each answer, provide a score and a very brief 1-sentence feedback.
+        
+        Data to evaluate:
         {answers_formatted_string}
         """
 
-      
+        # --- THE NEVER-FAIL CONFIGURATION ---
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            response_format={"type": "json_object"},
+            model="gpt-4o-mini",  # <--- Use this model (Cheaper & Smarter)
             messages=[
-                {"role": "system", "content": "You are an API that evaluates quiz answers and returns scores in a specified JSON format."},
+                {"role": "system", "content": "You are a strict grading assistant."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.4, # Lower temperature for more deterministic scoring
+            # This "json_schema" enforces the format 100%
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "grading_schema",
+                    "strict": True, # <--- This prevents hallucinated keys
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "evaluations": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "score": {
+                                            "type": "integer",
+                                            "description": "Score from 1 to 5"
+                                        },
+                                        "feedback": {
+                                            "type": "string",
+                                            "description": "Short reasoning for the score"
+                                        }
+                                    },
+                                    "required": ["score", "feedback"],
+                                    "additionalProperties": False
+                                }
+                            }
+                        },
+                        "required": ["evaluations"],
+                        "additionalProperties": False
+                    }
+                }
+            },
+            temperature=0.2, 
         )
 
         evaluation_content = response.choices[0].message.content
+        
+        # We can trust this load() because "strict": True guarantees validity
+        evaluation_data = json.loads(evaluation_content)
+        scores_list = evaluation_data["evaluations"]
 
-        try:
-            evaluation_data = json.loads(evaluation_content)
-            scores_list = []
-            # The model might wrap the list in a key, e.g., {"scores": [...]}. This handles that.
-            if isinstance(evaluation_data, dict):
-                list_values = [v for v in evaluation_data.values() if isinstance(v, list)]
-                if list_values:
-                    scores_list = list_values[0]
-                else:
-                    raise ValueError("JSON from AI is a dictionary but contains no list of scores.")
-            elif isinstance(evaluation_data, list):
-                scores_list = evaluation_data
-            else:
-                 raise ValueError("Unexpected JSON format from AI.")
+        if len(scores_list) != len(user_answers):
+             return jsonify({"error": "AI returned mismatched number of scores."}), 500
 
-            # Validate that the number of scores matches the number of answers
-            if len(scores_list) != len(user_answers):
-                 return jsonify({"error": "AI returned a mismatched number of scores."}), 500
+        # Merge results
+        final_results = []
+        for i, item in enumerate(user_answers):
+            final_results.append({
+                "question": item.get('question'),
+                "answer": item.get('answer'),
+                "score": scores_list[i].get('score'),
+                "feedback": scores_list[i].get('feedback') # Now you get feedback too!
+            })
 
-            # Combine the original questions and answers with the new scores
-            final_results = []
-            for i, item in enumerate(user_answers):
-                final_results.append({
-                    "question": item.get('question'),
-                    "answer": item.get('answer'),
-                    "score": scores_list[i].get('score', 0) # Default to 0 if score key is missing
-                })
-
-            return jsonify(final_results), 200
-
-        except (json.JSONDecodeError, ValueError) as e:
-            print(f"Error parsing AI response: {e}")
-            print(f"Raw AI response received: {evaluation_content}")
-            return jsonify({"error": "Failed to parse the evaluation from AI."}), 500
+        return jsonify(final_results), 200
 
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return jsonify({"error": "An internal server error occurred."}), 500
+        print(f"Server Error: {e}")
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
 
 
 if __name__ == '__main__':

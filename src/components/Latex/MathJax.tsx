@@ -4,6 +4,7 @@ import WebView, { WebViewMessageEvent } from 'react-native-webview';
 
 type Props = {
   html: string;
+  display?: boolean; // New Prop: Force display mode ($$ ... $$)
   css?: {
     color?: string;
     backgroundColor?: string;
@@ -11,6 +12,7 @@ type Props = {
     lineHeight?: string;
     fontWeight?: string;
     fontFamily?: string;
+    textAlign?: string;
   };
 };
 
@@ -26,7 +28,7 @@ class MathJax extends Component<Props, State> {
     super(props);
     this.webviewRef = createRef<WebView>();
     this.state = {
-      height: 100, // Initial placeholder height
+      height: 40,
       loading: true,
     };
   }
@@ -34,16 +36,23 @@ class MathJax extends Component<Props, State> {
   handleMessage = (event: WebViewMessageEvent): void => {
     const data = Number(event.nativeEvent.data);
     if (!isNaN(data) && data > 0) {
-      this.setState({ height: data, loading: false });
+      this.setState({ height: data + 8, loading: false });
     }
   };
 
   wrapMathjax = (content: string): string => {
-    const { css } = this.props;
+    const { css, display } = this.props;
 
-    // 1. Sanitize/Escape backslashes for the HTML string context
-    // This ensures \frac doesn't disappear before MathJax sees it.
-    const safeContent = content.replace(/\\/g, '\\\\');
+    // 1. Force Display Mode if requested
+    // If the content is "x=5", making it "$$ x=5 $$" forces MathJax to render it big and centered.
+    let finalContent = content;
+    if (display) {
+      // Strip existing delimiters just in case, then wrap
+      finalContent = `$$ ${content.replace(/^\$\$|\$\$$/g, '')} $$`;
+    }
+
+    // 2. Prepare for Injection
+    const safeJsonString = JSON.stringify(finalContent);
 
     return `
       <!DOCTYPE html>
@@ -51,52 +60,66 @@ class MathJax extends Component<Props, State> {
         <head>
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
           <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
-              margin: 0;
-              padding: 0;
               background-color: ${css?.backgroundColor || 'transparent'};
               color: ${css?.color || '#000000'};
               font-family: ${css?.fontFamily || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'};
               font-size: ${css?.fontSize || '16px'};
-              line-height: ${css?.lineHeight || '1.6'};
+              line-height: ${css?.lineHeight || '1.5'};
               font-weight: ${css?.fontWeight || 'normal'};
-              overflow: hidden; /* Hide scrollbars so we calculate exact height */
+              text-align: ${css?.textAlign || 'left'};
+              overflow: hidden; 
             }
             #math-content {
-              display: none; /* Hide until rendered to prevent jump */
-              padding: 1px; /* Prevent collapse */
+              display: none; 
+              padding-top: 2px;
+              padding-bottom: 2px;
             }
+            .mjx-block { margin: 0.2em 0 !important; }
           </style>
           
           <script>
             window.MathJax = {
+              loader: {load: ['[tex]/ams']},
               tex: {
+                packages: {'[+]': ['ams']},
                 inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
                 displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']],
               },
               startup: {
-                pageReady: () => {
-                  return MathJax.startup.defaultPageReady().then(() => {
-                    // 1. Math is rendered, show the div
-                    const content = document.getElementById("math-content");
-                    content.style.display = "block";
-                    
-                    // 2. Calculate height
-                    const height = content.scrollHeight;
-                    
-                    // 3. Send to React Native
-                    window.ReactNativeWebView.postMessage(String(height));
-                  });
-                }
+                typeset: false // Manual typeset trigger
               }
             };
           </script>
           <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
         </head>
         <body>
-          <div id="math-content">
-            ${safeContent}
-          </div>
+          <div id="math-content"></div>
+          
+          <script>
+            // INJECTION STRATEGY
+            var raw = ${safeJsonString};
+            var div = document.getElementById('math-content');
+            
+            // Double-escape backslashes if they were stripped
+            // This turns "frac" back into "\frac" if the context implies it, 
+            // but primarily we trust JSON.stringify. 
+            // If previous issues persisted, we might need to manually re-insert slash for common keywords.
+            // For now, let's trust raw injection.
+            div.innerText = raw; 
+
+            var checkMathJax = setInterval(function() {
+              if (window.MathJax && window.MathJax.typesetPromise) {
+                clearInterval(checkMathJax);
+                div.style.display = 'block';
+                window.MathJax.typesetPromise([div]).then(function() {
+                   var height = div.scrollHeight;
+                   window.ReactNativeWebView.postMessage(String(height));
+                });
+              }
+            }, 50);
+          </script>
         </body>
       </html>
     `;
@@ -114,7 +137,6 @@ class MathJax extends Component<Props, State> {
           originWhitelist={['*']}
           source={{
             html: wrappedHtml,
-            // Crucial for Android to load the CDN script
             baseUrl: Platform.OS === 'android' ? 'file:///android_asset/' : '',
           }}
           onMessage={this.handleMessage}
@@ -123,21 +145,6 @@ class MathJax extends Component<Props, State> {
           showsVerticalScrollIndicator={false}
           style={{ backgroundColor: css?.backgroundColor || 'transparent' }}
         />
-        {/* Optional: Placeholder while loading */}
-        {loading && (
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <ActivityIndicator color={css?.color || 'gray'} />
-          </View>
-        )}
       </View>
     );
   }
