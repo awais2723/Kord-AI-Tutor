@@ -25,6 +25,6 @@
       "@testing-library/jest-dom"
     ]
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "*.d.ts", "expo-env.d.ts", "firebase/temporary/NodeManager.js"],
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "*.d.ts", "expo-env.d.ts", "firebase/temporary/NodeManager.js", "src/screens/QuizEditorScreen.tsx"],
   "exclude": ["node_modules", "*.config.js", "eslint.config.js", ".prettierrc"]
 }

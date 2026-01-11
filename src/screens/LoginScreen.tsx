@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import {
   View,
@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { router } from 'expo-router';
 
 import { doSignInWithEmailAndPassword, getErrorMessage, doPasswordReset } from '@/firebase/auth';
 
@@ -178,7 +179,7 @@ class LoginScreen extends Component<Props, State> {
                 placeholder="Enter Email"
                 value={email}
                 onChangeText={text => this.setState({ email: text })}
-                className="border-2 text-gray-700 border-violet-700 rounded-md px-4 py-4 mb-8"
+                className="border-2 text-gray-700 border-violet-700 rounded-md px-4 py-4 mb-2"
                 autoCapitalize="none"
                 keyboardType="email-address"
               />
@@ -205,7 +206,7 @@ class LoginScreen extends Component<Props, State> {
               )}
               {message.error !== '' && <Text className="text-red-500 my-2">{message.error}</Text>}
 
-              <TouchableOpacity className="flex items-end mb-12" onPress={this.forgotPassword}>
+              <TouchableOpacity className="flex items-end mb-8" onPress={this.forgotPassword}>
                 <Text className="text-violet-700 font-bold text-l">Forgot Password?</Text>
               </TouchableOpacity>
 
@@ -221,7 +222,7 @@ class LoginScreen extends Component<Props, State> {
             </View>
           </View>
 
-          <View className="flex-row justify-center mt-1">
+          <View className="flex-row justify-center mt-0">
             <Text className="font-bold text-xl">Don&apos;t have an account?</Text>
             <Link href="/signup" asChild className="pl-2">
               <Text className="text-center text-violet-700 font-bold text-xl">Signup</Text>

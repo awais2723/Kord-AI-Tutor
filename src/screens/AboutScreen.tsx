@@ -9,7 +9,7 @@ const AboutScreen = () => (
         style={styles.logo}
         resizeMode="contain"
       />
-      <Text style={styles.title}>About Kord Snap & Solve</Text>
+      <Text style={styles.title}>Kord-AI Tutor</Text>
       <Text style={styles.description}>
         <Text style={styles.bold}>Kord Snap & Solve</Text> is a powerful React Native Expo
         application designed to help users solve mathematical questions step by step. Simply upload
@@ -17,8 +17,7 @@ const AboutScreen = () => (
         solution.{'\n\n'}
         <Text style={styles.bold}>Key Features:</Text>
         {'\n'}• Snap or upload images of math questions{'\n'}• Step-by-step solutions{'\n'}•
-        Supports a variety of math topics{'\n'}• User-friendly interface{'\n'}• Built with Expo,
-        React Native, and Firebase{'\n\n'}
+        Supports a variety of math topics{'\n\n'}
         This project is open source and maintained by a dedicated team. We welcome contributions and
         feedback from the community!
       </Text>

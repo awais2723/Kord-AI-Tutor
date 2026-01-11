@@ -86,7 +86,7 @@ class HomeScreen extends Component<Props, State> {
     });
 
     return (
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-slate-50">
         <View
           style={styles.shadow}
           className="w-full h-64 bg-primary rounded-b-xl flex-row pt-4 border-2">
@@ -134,7 +134,7 @@ class HomeScreen extends Component<Props, State> {
             className="w-11/12 h-18 bg-white rounded-lg flex-row mt-8 justify-center items-center"
             onPress={() => router.push('/scanToPdf')}>
             <MaterialCommunityIcons name="file-pdf-box" size={45} color="#6844EE" />
-            <Text className="text-center text-2xl text-gray-900 font-bold ml-8">Scan To PDF</Text>
+            <Text className="text-center text-2xl text-gray-900 font-bold ml-12">Scan To PDF</Text>
             <MaterialIcons name="navigate-next" size={50} color="#6844EE" />
           </TouchableOpacity>
         </View>

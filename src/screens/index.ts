@@ -26,3 +26,4 @@ export { default as QuestionResultScreen } from './QuestionResultScreen';
 export { default as MathResultScreen } from './MathResultScreen';
 export { default as ScanToPdfScreen } from './ScanToPdfScreen';
 export { default as PdfPreviewScreen } from './PdfPreviewScreen';
+export { default as QuizEditorScreen } from './QuizEditorScreen';

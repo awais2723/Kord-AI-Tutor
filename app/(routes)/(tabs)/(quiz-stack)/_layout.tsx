@@ -24,6 +24,7 @@ export default function StackQuizLayout() {
       <Stack.Screen name="mcqsResult" options={{ title: 'Result' }} />
 
       <Stack.Screen name="questionResult" options={{ title: 'Result' }} />
+      <Stack.Screen name="editQuiz" options={{ title: 'Edit Quiz' }} />
     </Stack>
   );
 }

@@ -407,10 +407,12 @@ def generate_quiz():
 
         quiz_content = response.choices[0].message.content
         print(quiz_content)
+        
     
         try:
             # The AI should return a JSON string. Parse it into a Python object.
             quiz_data = json.loads(quiz_content)
+            print("JSON PARSE FAILED")
             
             # Now, we specifically look for the "questions" key, which should be a list.
             if isinstance(quiz_data, dict) and "questions" in quiz_data and isinstance(quiz_data["questions"], list):
@@ -590,4 +592,4 @@ def evaluate_answers():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.0.100', port=5000)
+    app.run(debug=True, host='192.168.0.104', port=5000)

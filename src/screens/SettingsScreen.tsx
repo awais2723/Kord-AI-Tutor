@@ -422,7 +422,7 @@ class SettingsScreen extends Component<Props, State> {
             </View>
 
             {/* Account Actions Section */}
-            <View className="mb-8">
+            {/* <View className="mb-8">
               <Text className="text-gray-500 font-semibold text-sm mb-3 uppercase tracking-wide">
                 Account Actions
               </Text>
@@ -437,7 +437,7 @@ class SettingsScreen extends Component<Props, State> {
                 </View>
                 <Feather name="chevron-right" size={20} color="#9ca3af" />
               </TouchableOpacity>
-            </View>
+            </View> */}
 
             {/* Profile Edit Modal */}
             <Modal

@@ -8,8 +8,8 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 // Define the Routes where you want the Tab Bar to be VISIBLE
 const ROUTES_TO_SHOW_TAB_BAR = [
   'index', // The main screen of a stack
-  'home', // If you have a screen named home
-  'myProfile', // If you have a screen named myProfile
+  'home', 
+  'myProfile', 
 ];
 
 type TabBarIconProps = {
